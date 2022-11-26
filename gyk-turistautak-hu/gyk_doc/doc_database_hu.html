@@ -1,0 +1,255 @@
+<html>
+<head>
+<title>GyalogútKataszter v0.1 dokumentáció</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body bgcolor="#EAF2D3">
+
+<h1>Adatbázis - fejlesztői &amp; admin útmutató - GyalogútKataszter v0.1</h1>
+
+<h2>Általános konvenciók, elnevezések</h2>
+Mivel a mezőnevek ill. a táblanevek többfelé ismétlődnek, olykor kombinálva,
+a gyakoribb neveket, név-részeket listázzuk:
+<ul>
+    <li>trail - útvonal</li>
+    <li>noi - hely</li>
+    <li>node, trail_node - útvonalpont, nyomvonal eleme</li>
+    <li>sect, section - nyomvonalszakasz</li>
+    <li>..._rev - visszafelé, azaz fordított irányban</li>
+    <li>..._bidir - kétirányúsított változat</li>
+    <li>signpost - útjelző tábla</li>
+    <li>signpost_row - útiránysor</li>
+    <li>branch, trail_branch - leágazás</li>
+    <li>section, trail_section - útszakasz</li>
+    <li>stat, actual_stat - számított aktuális adatok</li>
+    <li>id - azonosító (belső, adatbázisbeli sorszám)</li>
+    <li>idx - sorszám (pl. adott útvonalon, táblán belül hányadik)</li>
+    <li>code - azonosító kód (felhasználó által megadható)</li>
+    <li>name, name2, ... - név, név variációk</li>
+    <li>picto - piktogram</li>
+    <li>priority - prioritás, fontosság (az útvonal mentén)</li>
+    <li>trailmark - útjelzés</li>
+    <li>modality - modalitás (gyalogos/kerékpáros/stb.)</li>
+    <li>tuhu - turistautak.hu</li>
+    <li>omp - openmaps.eu</li>
+    <li>lat, lon - szélesség, hosszúság</li>
+    <li>alt - magasság (tszf)</li>
+    <li>length_slope, length_projection - valódi hossz, vetületi hossz (m-ben!)</li>
+    <li>ascent - szintemelkedés</li>
+    <li>minutes - menetidő percben</li>
+    <li>segments - turistautak.hu szakaszazonosítók listája (itiner)</li>
+    <li>points - nyomvonal koordináták</li>
+    <li>..._to - -ig (előre irány)</li>
+    <li>..._from - -tól (visszafelé irány)</li>
+    <li>..._rounded - kerekített (táblára kiírandó)</li>
+    <li>is_hidden - rejtett (nem jelenik meg)</li>
+    <li>is_virtual - virtuális (valóságban nem különálló)</li>
+    <li>def_... - alapértelmezett</li>
+    <li>..._ext - kibővített</li>
+    <li>description - leírás</li>
+    <li>remark - megjegyzés</li>
+    <li>country - ország</li>
+    <li>region - régió</li>
+    <li>town - település</li>
+    <li>parent - fölérendeltje (hierarchikus szerk.ben)</li>
+    <li>group - csoport (különböző projekhez/térséghez/kezelőhöz tartozó elemek kategóriái)</li>
+    <li>type, subtype - típus, altípus</li>
+    <li>content - tartalom</li>
+    <li>param_name - paraméter név</li>
+    <li>value - paraméter érték</li>
+</ul>
+
+<h2>Adattáblák és nézetek</h2>
+<h3>Noi tábla</h3>
+A Helyek adattáblája. Azonosítója a noi_id (auto-increment).
+
+<h3>Trail tábla</h3>
+Az útvonalak adattáblája. Azonosítója a Trail_id (auto-increment, csak pozitív legyen).
+Az útvonalak leíró alapadatait tartalmazza.
+
+<h3>Trail_node tábla (Noi és Trail kapcs.)</h3>
+Az útvonalak nyomvonalait tartalmazza, az útvonalak (trail) és a helyek (noi) összekapcsolásával.
+Azonosítója a trail_node id (auto-increment, csak pozitív legyen).
+<br><br>
+
+Ebben a táblában hozhatjuk létre a trail táblában definiált útvonalak nyomvonalait,
+hogy milyen útvonalpontokat (noi) érintenek és e pontok között milyen nyomvonalon vezetnek.
+<br><br>
+
+A tábla egy sora az útvonalnak (trail_id) egy pontjára hivatkozik és az előző pontból
+odáig elvezető nyomvonalat, annak adatait tartalmazza. Az útvonalon belül a node_idx
+az útvonalpont (nyomvonal elem) sorszáma. Törlés ill. beszúrás esetén az adott útvonal
+minden rákövetkező nyomvonal elemének node_idx-ét módosítani kell.
+<br><br>
+
+Előfordulhat, hogy olyan pontot (noi) tartalmaz, amely nem az útvonalon található,
+hanem leágazással érthető el, de mégis az útvonal egy pontjaként szeretnénk szerepeltetni
+(pl. azért, mert egy útjelző táblán korábban kiírjuk, hogy ide ezen az útvonalon
+el lehet jutni). Ekkor az útvonalról való leágazás adatait a branch_id bejegyzés
+nyomán a trail_branch (ld. alább) táblában kell tárolni és itt a szakaszadatokat
+az előző útpontból indulva csak a leágazás kezdőpontjáig kell beírni, mely az útvonalon van
+(ha a leágazás kezdőpontja maga is útpont, többnyire az előző útvonalpont az, és így
+e nyomvonalrész adatok nullák lesznek). Leágazás esetén is viszont a leágazás célpontját
+kell útpontként (noi, név) feltüntetni.
+
+<h3>Trail_branch tábla</h3>
+
+Leágazások adattáblája. Ha egy útvonalpont valójában nem az adott útvonalon helyezkedik
+el, hanem leágazással érhető el, ebben a táblában adhatjuk meg a leágazás adatait.
+A leágazásra a branch_id azonosítóval a trail_node (ld.fent) tábla hivatkozik.
+Megadhatunk csak adatokat is, de jobb ha egy útvonalra (branch_trail) is hivatkozunk,
+amelynek két pontja mentén a leágazás értendő.
+<br><br>
+
+Pl. ha egy zöld sáv jelzésű útból egy zöld háromszög ágazik ki egy közeli kilátóponthoz,
+akkor mindkettőt létrehozzuk mint útvonalat (trail, trail_node táblák) és a trail_branch
+táblában a zöld háromszög mentén (arra hivatkozva) létrehozhatunk egy leágazást,
+így a zöld sáv útpontjai között feltüntetjük magát a kilátópontot is. Így azt előre
+jelezhetjük pl. a zöld sáv egy korábbi útirányjelzőjén is.
+
+<h3>Trail_bidir nézet (trail táblából)</h3>
+
+Az útvonalak egy bővített nézete, melyben minden trail táblabeli útvonal szerepel
+és minden útvonalnak a "fordítottja" is, azaz ellenkező irányú változata
+(ha egy útvonalat beszúrunk a trail táblába, akkor a trail_bidir nézetben szerepelni
+fog mindkét irányú változata, a ..._rev mezők felhasználásával).
+<br><br>
+
+Egy útvonal ellenkező irányú változatának azonosítója mindig ugyanaz mint az eredetié,
+csak negatív előjellel.
+
+<h3>Trail_node_bidir nézet (trail_node táblából)</h3>
+
+Az útvonalak nyomvonalainak egy bővített nézete, melyben minden trail_node táblabeli
+útpont, nyomvonalrész szerepel és minden útvonalnak a "fordított nyomvonala" is,
+azaz ellenkező irányú változata (ha egy útvonalat beszúrunk a trail táblába és
+elkészítjük hozzá a nyomvonalat a trail_node táblában, akkor a trail_node_bidir
+nézetben szerepelni fog a visszafelé irányú változata is).
+<br><br>
+
+Egy útvonalpont ellenkező irányú változatának azonosítója mindig ugyanaz mint az eredetié,
+csak negatív előjellel. Az ellenkező irányú változatnál az előző pontból odáig vezető nyomvonal adatai
+(sect_...) mindig az eredeti útvonal következő útpontjához tartozó nyomvonal-adatokból származnak.
+
+<h3>Trail_section tábla (trail_bidir és trail_node_bidir alapján)</h3>
+
+Útszakaszok adattáblája. Azonosítója a trail_section_id (auto-increment, csak pozitív legyen).
+<br><br>
+
+Egy útvonalhoz tetszőleges szakaszokat definiálhatunk,
+bármely irányban, bármely pontjától bármely más pontjáig. Ha nem adunk meg kezdő- vagy
+végpontot, akkor a szakasz az útvonal mindenkori elejétő ill. végéig számít.
+A szakasznak egy paraméter nevet és értéket adunk meg, mely a szakasz jellegét, jelentését
+határozza meg (pl. organization=szervezet, mely szervezet gondozza, region, area stb.).
+<br><br>
+
+A trail_section tábla mindig a *_bidir táblákra hivatkozik, azaz ha egy útvonal
+fordított irányára akarjuk szakaszt definiálni, akkor a negatív előjelű változatát
+kell használnunk.
+<br><br>
+
+A szakasz alapvetően kétirányúnak számít, de ha egyirányúként akarjuk definiálni, akkor az is_oneway-t kell 1-re állítani.
+<br><br>
+
+A with_branch azt határozza meg, hogy a leágazások is beszámítsanak-e a szakaszba (pl. hossz összesítésénél),
+vagy pedig csak az útvonal "törzs-nyomvonala".
+
+<h3>Trail_section_bidir nézet (trail_section táblából)</h3>
+
+Az útvonal-szakaszok egy bővített nézete, melyben minden trail_section táblabeli útszakasz szerepel
+és minden szakasznak a "fordítottja" is, azaz ellenkező irányú változata, amelyik nem egyirányú
+(ha egy útvonalat beszúrunk a trail táblába nem egyirányúként, akkor a trail_section_bidir nézetben szerepelni
+fog mindkét irányú változata).
+<br><br>
+
+Egy útvonal ellenkező irányú változatának azonosítója mindig ugyanaz mint az eredetié,
+csak negatív előjellel.
+
+<h3>Trail_section_expanded nézet (trail_section_bidir és trail_node_bidir nézetekből)</h3>
+
+Az útvonal-szakaszok kifejtése, azaz nyomvonal-elemei a trail_node táblához hasonlóan.
+
+<h3>Trail_section_stat nézet (trail_section_bidir nézetből)</h3>
+
+Az útvonal-szakaszok összesített, számított adatai (pl. össz-táv, stb).
+
+
+<h3>Signpost tábla</h3>
+
+Adott helyen (noi) lévő útjelző táblák. A táblaoszlop is ide hozandó létre. Hierarchikus
+szerkezetet alkotnak, azaz a parent_id mezőben egy másik táblára hivatkozhatunk
+(egy oszlopon lévő táblák az oszlopra hivatkoznak, az a fölérendeltjük; vagy egy
+nagyobb, több panelből álló tábla több másik táblát is tartalmazhat - utóbbi esetben
+a tartalmazott táblák virtuálisnak tekintendők).
+<br><br>
+
+A tábla content mezőjébe kell írni a tábla tartalmát. Ha a tábla útiránysorokat
+tartalmaz (azaz útirányjelző, egy-egy útvonal mentén elérhető célponto(ka)t és az odáig
+vezető út adatait tartalmazza), akkor az útiránysorokat nem kell a contentben kézzel kiírni,
+hanem külön útiránysorokként (ld. signpost_row tábla) hozhatjuk létre, struktúrálva.
+Egy tábla akár egyszerre több útvonalra is vonatkozhat, adatbázis szinten nincs megkötés
+az útiránysorokra vonatkozóan.
+[Útjelzést is pl. soronként kell megadni, ha az útirányjelző táblán a tábla "layoutjának" megfelelően
+a nyílhegyben közös útjelzést akarunk, az is az útiránysorokból jön, ez adatbázis szinten nincs meghatározva:
+lehet az első (ill. fejléc) sor útjelzése a közös jelzés, s ettől eltérő soroknál soronként különféle jelzések lesznek.]
+Ha a tábla több "panelt" tartalmaz, pl. különféle irányokba mutató nyilakkal, akkor létrehozhatunk virtuális "altáblákat" is.
+<br><br>
+
+A signpost lehetőleg mindig noi-n legyen, még akkor is ha az adott noi nem feltüntetett útpontja
+a táblák által hivatkozott útvonalaknak (bár ez a javasolt megoldás). Az alárendelt (tartalmazott)
+táblák is hivatkozzanak a hely noi-ra, ne csak a szülő.
+<br><br>
+
+A táblatípusok pl. "tablaoszlop", "utiranyjelzo", "helymegjelolo", de tetszőleges típusnév megadható.
+<br><br>
+
+A direction és angle mezők az útirányjelző tábla irányát (j/b) ill. irányszögét tartalmazhatják.
+<br><br>
+
+A tábla státusa lehet: "wish" (javasolt, vágyott), "planned" tervezett, "installed" felszerelt/kihelyezett,
+    "IMPORT" (importált adat, még letisztázandó), stb. bármilyen státusnév definiálható.
+<br><br>
+
+Tárolhatjuk a kihelyezés, ellenőrzés dátumát és a condition mezőben az állapotot.
+
+<h3>Signpost_row tábla (signpost tábla és trail_bidir, trail_node_bidir nézetek kapcs.)</h3>
+
+Útirányjelző táblák útiránysorai. Egy sor a megadott táblán (signpost_id) a megadott sorszámú (row_idx) útiránysor
+adatait tartalmazza. A tábla helye a megadott útvonal (trail_id) megadott pontja (from_node_id),
+ill. attól az offset_length és offset_minutes mezőkben megadott távra előre felé lévő pont az úton.
+Az útiránysor ettől a ponttól a to_node_id-vel megadott útvonalpontig
+<br><br>
+
+A táv-idő adatok az aktuális nyomvonal adatok alapján számolhatók, de attól függetlenek,
+hogy változás esetén is a mindekori megtervezett/kihelyezett adatokat tartalmazzák
+és így összehasonlíthatók legyenek az aktuális nyomvonalak alapján számolt adatokkal
+(ld. signpost_row_actual_stat nézet).
+<br><br>
+
+A has_branchline mező azt mondja meg, kell-e a táblán elválasztó vonalat húzni a sor fölé
+(külön ágon, útirányon elérhető célpontra utal-e, vagy az előző útiránysor folytatásaként érhető el).
+
+<h3>Signpost_row_actual_stat nézet (signpost_row tábla és trail_node_bidir nézetekből)</h3>
+
+A signpost_row-ban létrehozott útiránysorokhoz az aktuális nyomvonal-adatok (trail_node_bidir)
+alapján számított adatai (táv, szint, menetidők).
+
+<h2>Importálás Excelből</h2>
+
+Az alábbi leírás alapján, kellő körültekintéssel importálhatunk adatokat
+nyomvonal- és táblatervező excelekből:
+<br><br>
+
+<a href="excel_import_howto_hu.txt">Útvonalak, Útirányjelzők Excel importja</a>
+<br><br>
+
+A beolvasott adatok az IMPORT_... táblákon keresztül kerülnek be az adatbázisba,
+melyek az importálás befejezése és az adatok letisztázása után elvileg törölhetők.
+
+<hr>
+
+<ul>
+    <li><a href="index.html">Vissza a dokumentáció tartalomjegyzékéhez</a></li>
+</ul>
+
+</body>

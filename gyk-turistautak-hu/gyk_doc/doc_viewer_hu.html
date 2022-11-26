@@ -1,0 +1,198 @@
+<html>
+<head>
+<title>GyalogútKataszter v0.1 dokumentáció</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body bgcolor="#EAF2D3">
+
+<h1>Böngésző súgó - GyalogútKataszter v0.1</h1>
+
+A böngésző az adatok megjelenítésére, böngészésére szolgál.
+Az alábbi nézetekből épül fel:
+
+<ul>
+    <li><a href="#list_trails">Útvonalak listája</a></li>
+    <li><a href="#list_trail_sections">Útvonalak szakaszainak listája</a></li>
+    <li><a href="#view_trail">Útvonal megjelenítése</a></li>
+    <li><a href="#view_trail_section">Útszakasz megjelenítése</a></li>
+    <li><a href="#view_signpost">Útjelző tábla megjelenítése</a></li>
+</ul>
+
+<h2><a name="list_trails">Útvonalak listája</a></h2>
+
+Az útvonalak táblázatát láthatjuk. Az oszlopok: (az adatbázisban ténylegesen ennél több adat tárolható)
+<ul>
+    <li>ID - az útvonal (belső) azonosító száma az adatbázisban</li>
+    <li>Útkód - az útvonal azonosító kódja, ha van + modalitás piktogram (gyalogos/kerékpáros, stb.)</li>
+    <li>Jel - az útvonal útjelzése a terepen (piktogram)</li>
+    <li>Leírás - Általános leírás az útvonalról, mely utalhat annak nyomvonalára</li>
+    <li>Hossz - Az útvonal hossza km-ben (technikai mj.: ez a megjelenítés gyorsasága végett nem számított mező, hanem akkor jelenik meg, ha az adatbázisban van az útvonal egészére definiálva egy length_slope paraméterű útszakasz, az ott tárolt érték jelenik meg; számított értékeket az útvonal szakaszainál kaphatunk)</li>
+    <li>Turistautak.hu útvonal - Az útvonal lapja a turistautak.hu-n, ha van (technikai mj.: az adatbázisban ezt az útvonal egészére létrehozott, tuhu_route paraméterű útszakasz definiálja)</li>
+    <li>Napi szakaszok - Az útvonal napi szakaszokra bontva (technikai mj.: az adatbázisban ezt az etap paraméterű útszakaszok definiálják)</li>
+    <li>Szervezetek- Az útvonalat gondozó szervezetek (technikai mj.: az adatbázisban ezt az organization paraméterű útszakaszok definiálják)</li>
+</ul>
+Az Útkód, jel, leírás oszlopok valamelyikére kattintva a teljes útvonal megjelenítésére ugorhatunk,
+a Napi szakaszok oszlopra kattintva a szakaszlistát kapjuk részletezve, míg a turistautak.hu útvonalra kattintva
+az útvonal turistautak.hu-n létrehozott megfelelőjének lapját kapjuk, ahol itinert is kérhetünk.
+<br><br>
+
+Az útvonallistában szereplő elemeket a webcímben (URL) megadott paraméterek határozzák meg (ha pl. egy útvonalpontra kattintva ugrottunk ide, akkor csak az azon átvezető útvonalak jelennek meg).
+A paraméterek lehetnek:
+<ul>
+    <li>noreverse - minden útvonal csak egyirányban jelenik meg. Ha ezt elhagyjuk, akkor a visszafelé irányok is külön útvonalakként jelennek meg.</li>
+    <li>param_name=... - azok az útvonalak jelennek meg, amelyekhez van az adatbázisban ... (név behelyettesíthető) paraméterű szakasz. Pl. param_name=etap esetén azon útvonalak jelennek meg, amelyekhez napi szakaszok tartoznak.</li>
+    <li>value=... (csak param_name-mel együtt) - azok az útvonalak jelennek meg, amelyekhez van a megadott paraméter értékű szakasz. Pl. param_name=organization&amp;value=MTSz esetén az MTSz kezelésében (is) lévő útvonalak jelennek meg.</li>
+    <li>noi=... - azok az útvonalak jelennek meg, amelyek a megadott helyet érintik (akár valamely hozzájuk rendelt kitérővel).</li>
+    <li>orderby=... - megadott szempontú rendezés (ennek hiányában, alapértelmezésben útjelzés szerint rendez), ... helyén lehet: trail_id, trail_code, trailmark, modality, name, description.</li>
+</ul>
+
+<h2><a name="list_trail_sections">Útvonalak szakaszainak listája</a></h2>
+
+Az útvonalszakaszok táblázatát láthatjuk. Útvonal-szakasz egy-egy útvonal nyomvonalán
+nevesített 2 pont között definiálható az adatbázisban és jellege/jelentése paraméterben megadható.
+Egy-egy útvonalhoz tetszőleges számú szakasz létrehozható, akár átfedésekkel.
+Meghatározott kezdő- ill. végpont
+hiányában a szakasznak a teljes útvonal mindenkori kezdő- ill. végpontja számít.
+Az útvonal-szakasz lehet az adott útvonal ajánlott napi szakasza (etap), de
+párhuzamosan más típusú szakaszolás is lehetséges, pl. gondozó szervezetek, térségek
+szerint, vagy az útvonal valamely adata (pl. kerekített hossz, az útvonal
+turistautak.hu-n lévő megfelelőjének azonosítója) is tárolható szakaszparaméterként, 
+külön szakaszt létrehozva ezen adathoz.
+<br><br>
+
+Az oszlopok:
+<ul>
+    <li>Szakasz ID - az útvonal szakasz (belső) azonosító száma az adatbázisban</li>
+    <li>Útvonal - az útvonal (melyhez a szakasz tartozik) útjelzése és azonosító kódja, ha van</li>
+    <li>Tól - az útszakasz kezdőpontja az útvonal mentén</li>
+    <li>Ig - az útszakasz végpontja az útvonal mentén</li>
+    <li>Szakasz paraméter - az útszakasz jellegét, jelentését meghatározó paraméter, pl.:
+        <ul>
+            <li>etap - napi szakasz, értéke a napi szakasz azonosítója</li>
+            <li>oragnization - az útvonal adott részét kezelő szervezet</li>
+            <li>region, area - az útvonal adott része a paraméterben lévő régión ill. térségen vezet át</li>
+            <li>established - az útvonal adott része a paraméterben megadott időben létesült</li>
+            <li>length_slope - az útvonal hossza (jelenleg csak teljes útvonalhoz)</li>
+            <li>tuhu_route - az útvonal turistautak.hu-s megfelelője (jelenleg csak teljes útvonalhoz)</li>
+            <li>... - bármi más is lehet, amit az útvonalak szerkesztője megad</li>
+        </ul>
+    </li>
+    <li>Hossz - a szakasz számított hossza km-ben és menetideje óra-perc megjelenítésben</li>
+</ul>
+A Szakasz ID, Tól, Ig, szakasz paraméter oszlopok valamelyikére kattintva a szakasz (nyomvonalának) megjelenítésére ugorhatunk,
+az Útvonalra kattintva pedig a teljes útvonal lapjára, melynek része ez a szakasz.
+<br><br>
+
+A szakaszlistában szereplő elemeket a webcímben (URL) megadott paraméterek határozzák meg (ha pl. egy útvonalra kattintva ugrottunk ide, akkor annak az útvonalnak a szakaszai jelennek meg).
+A paraméterek lehetnek:
+<ul>
+    <li>trail=... - A ... helyén megadott útvonalhoz tartozó (az adatbázisban definiált) szakaszok jelennek meg.</li>
+    <li>param_name=... - a megadott paraméterű szakaszok jelennek meg. Pl. param_name=etap esetén csak napi szakaszok jelennek meg.</li>
+    <li>value=... (csak param_name-mel együtt) - a megadott paraméter értékű szakasz(ok). Pl. param_name=organization&amp;value=MTSz esetén az MTSz kezelésében (is) lévő útvonal-szakaszok jelennek meg.</li>
+    <li>orderby=... - megadott szempontú rendezés (ennek hiányában, alapértelmezésben param_name és value szerint rendez), ... helyén lehet: trail_section_id, trail_id, from_node_id, to_node_id, param_name, value.</li>
+</ul>
+
+
+<h2><a name="view_trail">Útvonal megjelenítése</a></h2>
+
+Egy megadott útvonal lapját, annak teljes nyomvonalát láthatjuk (hogy melyik útvonalét, az
+a webcím [URL] trail_id paraméterében adható meg).
+<br><br>
+
+Az első táblázat az útvonal alapadatait tartalmazza, az útvonallistával megegyező formában.
+<br><br>
+
+A [Szakaszolás, paraméterek] linkre kattintva az útvonalhoz definiált összes szakaszt listázhatjuk (ld. <a href="#list_trail_sections">szakaszok listája</a>).
+<br><br>
+
+A [Visszafelé irány] linkre kattintva az útvonal fordított irányú változatát kapjuk (a nyomvonal pontjai hátulról előrefelé következő sorrendben).
+<br><br>
+
+A nyomvonal táblázatában egymás alatt láthatók az útvonal mentén nevesített útpontok és a köztük lévő nyomvonalrészek útjelzés és táv-idő adatai, itinerlinkjei.
+Az útpontok némelyike nem szigorúan az út mentén található, hanem kitérővel érhető el az útvonalról.
+Ezek neve előtt zöld alapon fehér nyilacskás ikon látható, nevük dőlt betűvel szedett és velük egy sorban a kitérőre vonatkozó útjelzés és táv-idő adatok valamint itinerlink szerepelnek.
+<br><br>
+
+A nyomvonaltáblázat oszlopai: (az adatbázisban ténylegesen ennél több adat tárolható)
+<ul>
+    <li>ID - a nyomvonal(pont) azonosító az adatbázisban</li>
+    <li>Idx - a pont sorszáma az útvonal mentén</li>
+    <li>Pri - a pont prioritása, fontossága az útvonal mentén (1-10 a legfontosabb a 10-es, 0: nincs megadva)</li>
+    <li>Útpont - Az útpont neve, kapcsolódó linkek ikonjai:
+        <ul>
+          <li>zászló és név: rákattintva az adott ponton átvezető útvonalak listáját kapjuk</li>
+          <li>lap: ha van az útponthoz tartozó helyhez megadva POI a turistautak.hu-n, akkor annak lapja</li>
+          <li>földgömb: ha vannak az útponthoz tartozó helyhez koordináták megadva, akkor megjeleníti a turistautak.hu térképén</li>
+          <li>tábla (lehet belőle több is): ha vannak az útponthoz tartozó helyhez útjelző táblák az adatbázisban, akkor azok jeleníthetők meg. Annyi ikon jelenik meg, ahány különálló tábla(oszlop) található az adatbázisban (tech.mj.: azaz ahány olyan útjelző tábla(/oszlop) van az adatbázisban, amelynek már nincs fölérendeltje, ui. egy táblával együtt megjelennek annak alárendeltjei is - pl. egy oszlophoz a rajta lévő táblák mindegyike).</li>
+        </ul>
+    </li>
+    <li>Mod+jel - a két pont közötti nyomvonal [vagy pont esetén az oda vezető kitérő] modalitása, útjelzése (általában az útvonal egészének útjelzése, de 1-1 szakasz eltérhet)</li>
+    <li>Táv - a két pont közötti nyomvonal [vagy pont esetén az oda vezető kitérő, dőlt betűvel] hossza km-ben, egy tizedes pontossággal.</li>
+    <li>Szint - a két pont közötti nyomvonal [vagy pont esetén az oda vezető kitérő, dőlt betűvel] szintemelkedése (+) és szintereszkedése (-) m-ben.</li>
+    <li>Idő - a két pont közötti nyomvonal [vagy pont esetén az oda vezető kitérő, dőlt betűvel] menetideje percben.</li>
+    <li>Itiner - a két pont közötti nyomvonal [vagy pont esetén az oda vezető kitérő, dőlt betűvel] nyomvonala a turistautak.hu-n (link).</li>
+</ul>
+
+Bármely adat hiányozhat, mivel a rendszer képes hiányos adatok kezelésére, mely az ismeret/adathiányból vagy a tervezés adott fázisának sajátosságaiból adódhat
+(pl. hiányozhat a táv adat, ha nem ismert [még] a két útpont közötti nyomvonal és így annak hossza sem).
+
+<h2><a name="view_trail_section">Útszakasz megjelenítése</a></h2>
+
+Egy megadott útvonal-szakasz lapját, annak nyomvonalát láthatjuk (hogy melyik útszakaszét, az
+a webcím [URL] trail_section_id paraméterében adható meg).
+<br><br>
+
+Az első táblázat az útszakasz alapadatait tartalmazza, az útszakaszlistával megegyező formában.
+<br><br>
+
+A [Visszafelé irány] linkre kattintva az útszakasz fordított irányú változatát kapjuk (a nyomvonal pontjai hátulról előrefelé következő sorrendben).
+<br><br>
+
+A nyomvonal táblázatában egymás alatt láthatók az útvonal mentén nevesített útpontok és a köztük lévő nyomvonalrészek útjelzés és táv-idő adatai, itinerlinkjei.
+Az útpontok némelyike nem szigorúan az út mentén található, hanem kitérővel érhető el az útvonalról.
+Ezek neve előtt zöld alapon fehér nyilacskás ikon látható, nevük dőlt betűvel szedett és velük egy sorban a kitérőre vonatkozó útjelzés és táv-idő adatok valamint itinerlink szerepelnek.
+<br><br>
+
+A nyomvonaltáblázat oszlopai megegyeznek az útvonalak megjenenítése oldal táblázatával.
+A szakasz nyomvonal adatai az útvonal nyomvonalában származnak, a szakasznál megadott kezdő- ill. végpont között.
+
+<h2><a name="view_signpost">Útjelző tábla megjelenítése</a></h2>
+
+Egy megadott útjelző tábla (ill. oszlop, mert az adatbázisban az is táblának számít csak a típusa oszlop) lapját láthatjuk (hogy melyik tábláét, az
+a webcím [URL] id paraméterében adható meg). A táblával az ahhoz tartozó "alárendelt" táblák is megjelennek, a táblázat jobb oldalára beágyazva; azaz pl. egy táblaoszlop megjelenítésével
+láthatjuk az oszlopon lévő táblákat is.
+<br><br>
+A táblázat(ok)ban minden egyes táblához(/oszlophoz) külön címsor és tartalmi sor tartozik.
+A bal oldali oszlopban a címsorban a tábla (ill. útjelző elem, pl. oszlop) típusa szerepel,
+alatta a tartalmi sorban a tábla adatai (ami meg van belőle adva az adatbázisban):
+<ul>
+    <li>mai: maintaineer - fenntartó szervezet</li>
+    <li>spo: sponsor - támogató, finanszírozó</li>
+    <li>sta: status - státus, pl. wish - vágyott, planned - tervezett, installed - felszerelt, IMPORT - excelből importált adat</li>
+    <li>con: condition - állapot</li>
+    <li>mat: material - anyag, kivitel</li>
+    <li>dir: direction - irány formátum (útirányjelző esetén balos vagy jobbos)</li>
+    <li>ang: angle - irányszög (a tábla az oszlopon milyen földrajzi irányba mutat)</li>
+</ul>
+
+A táblázat(ok) jobb oldali oszlopában a címsorban a tábla azonosító kódja szerepel, alatta
+a tartalmi sorban a tábla tartalma, felirata(i). 
+<br><br>
+Útirányjelző tábla esetén a tábla tartalma táblázatos formában jelenik meg, útiránysoronként.
+A táblázat bal- ill. jobbszélső oszlopai a tábla iránymutató részének felelnek meg, attól függően, hogy
+a tábla bal vagy jobb irány-formátumú. Ezt az adott oszlopban nyílhegyek jelzik, valamint ide
+kerül az útjelzés is, ha van a táblán (tech.mj.: az egész tábla útjelzése az iránysorokból következik:
+az első sorban (head) szereplő útjelzés kerül az iránymutató részbe, s csak azon soroknál jelenik meg külön útjelzés is,
+amelyek ettől eltérő jelzést tartalmaznak.
+<br><br>
+Az iránysor első oszlopában a célpont neve szerepel, utána a piktogramok (ha vannak), amik az adott célpont jellegére, az ott található
+látnivalókra ill. szolgáltatásokra utalhatnak. A célpont neve fölött vízszintes elválasztó vonal jelenik meg, ha ez az adatbázisban szerepel.
+Olyankor szokás, ha a célpont az előző sor célpontjához képest más útvonalon érhető el (azaz nem onnan továbbhaladva, hanem már előzőleg elágazva).
+A tábla útiránysorának további két oszlopában a táv (km-ben) és a menetidő (ó-p, konvenció szerint 30 p fölött 5 p-re kerkítve és 10 óra felett elhagyva) látható.
+<hr>
+
+<ul>
+    <li><a href="index.html">Vissza a dokumentáció tartalomjegyzékéhez</a></li>
+</ul>
+
+</body>

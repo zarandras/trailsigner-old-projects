@@ -1,0 +1,550 @@
+<html>
+<head>
+<title>GyalogútKataszter v0.1 dokumentáció</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body bgcolor="#EAF2D3">
+
+<h1>Szerkesztő felület - kezelői útmutató - GyalogútKataszter v0.1</h1>
+
+<h2>Általános használati, szerkesztési tudnivalók</h2>
+
+A szerkesztő felületre jelszóval lehet belépni. Jelenleg a jelszó a felület elérését
+szolgálja, így belépés után az adatbázis összes adatát lehet látni és szerkeszteni,
+nincs felhasználónkénti megkülönböztetés, ezért körültekintő használat szükséges.
+<br><br>
+
+Belépéskor üres képernyő fogad minket, fent jobb oldalon a lenyíló listából lehet kiválasztani,
+hogy mit akarunk listázni/szerkeszteni az adatbázisból (hely, útvonal, stb).
+Ezen objektumoknak és a hozzájuk tartozó listázó/szerkesző panelek tételes leírását ld. lejjebb
+e dokumentumban. A rendszer működésének, az adatok szervezésének jobb megértéséhez érdemes
+a közbülső fejezeteket is elolvasni, az egyes elemeket létrehozásának menetéről.
+<br><br>
+
+Minden listázható/szerkeszthező adatbázis objektum (hely, útvonal stb.) paneljeire az
+alábbiak általában, egységesen vonatkoznak. Típusfüggő eltérést, kiegészítést lent az egyes
+panelek leírásánál találhatunk.
+<br><br>
+
+A bal oldali panelen egy táblázatos listát láthatunk az adott típusú objektum
+(pl. hely, útvonal) főbb adataival. A lista tartalmát, hogy mely objektumok listázódjanak,
+többnyire a panel tetején lévő szűrő/kereső mezőkkel befolyásolhatjuk. Ahol több szempontot
+is megadhatunk (és megadunk), ott azok mindegyikének együttesen megfelelő objektumok listázódnak.
+Ha nem adunk meg keresési szempontot, akkor az aktuális típus ill. keresés jellegétől függően
+minden objektum vagy semmi sem listázódik (ha pl. a helyszín kereséskor a névre nem szűrünk,
+akkor minden hely listázódik, viszont ha pl. nyomvonalhoz nem választunk útvonalat, akkor nem listázódik ki semmi).
+Szöveges mező esetén szövegrészre is lehet keresni. Továbbá, a keresőszövegben a _ jel egy tetszőleges karaktert, míg a % jel tetszőleges számú
+tetszőleges karaktert jelent.
+<br><br>
+
+A bal oldalon megjelenő táblázat minden sora egy-egy objektumnak felel meg,
+néhány kiválasztott, főbb adatmezőt tartalmaz. Egyes mezőkben linkek találhatók, melyre
+kattintva kapcsolódó lapot, esetleg térképet jeleníthetünk meg, vagy műveletet végezhetünk
+az adott objektummal. Az adott objektum szerkesztéséhez vagy törléséhez a 'Szerkesztés'
+oszlopban kell kattintani. A táblázat oszlopaira kattintva rendezhető az adott oszlop szerint
+a lista. Ha a lista hosszabb, mint a megjeleníthető elemek száma, akkor a táblázat felett
+megjelenő oldalszámokra kattintva lapozhatunk.
+<br><br>
+
+Többnyire a bal oldali táblázat alatt jelenik meg az új objektum létrehozása gomb is.
+<br><br>
+
+Jelenleg "tömeges" (több objektum egyszerre történő) szerkesztésre/törlésre nincs lehetőség.
+Ha ilyen igény merül fel, akkor azt érdemes közvetlenül az adatbázis adminisztrációs felületén
+elvégezni (PhpMyAdmin vagy hasonló eszközzel), az adatbázis adminisztrátor segítségével.
+<br><br>
+
+A jobb oldali panelen a szerkesztésre kiválasztott objektum összes adatmezőjét láthatjuk.
+Ha új objektumot hozunk létre, akkor a mezők üresek ill. alapértelmezett értékeket tartalmaznak.
+Minden módosítást a mezők alatt lévő (többnyire görgetni kell hozzá) OK gombbal menthetünk
+be az adatbázisba, vagy a módosításokat a Mégsem gombbal vethetjük el. Az objektumot a szintén 
+itt található Törlés gombbal törölhetjük ki.
+<br><br>
+
+Az adott objektum adatai közül a csupa nagybetűs, vastaggal szedett mezők kitöltése formailag
+is kötelező, azaz ezek hiányában nem menthető el az objektum az adatbázisba. A táv adatok méterben(!),
+az idő adatok percben, a magasság-emelkedés-ereszkedés méterben adandók meg.
+<br><br>
+
+A legtöbb adatot a jelenlegi verzióban kézzel kell megadni, az adatok egy része elvileg számolódhat
+vagy lekérdeződhet kívülről (pl. turistautak.hu) alapján. Későbbi verzióban tervezett
+ezeknek, valamint a formátum ellenőrzéseknek és a különféle előre definiált értékkészleteknek
+(válaszó listák) a fejlesztése.
+
+<h2>Útvonalak és nyomvonalak, létrehozásuk menete</h2>
+Az Útvonalak részben az útvonalak alapadatait szerkeszthetjük (pl. név, útjelzés, stb.). Hogy az útvonalak
+merre vezetnek, milyen pontokat érintenek és a pontok közti szakaszok milyen adatokkal rendelkeznek,
+azt a nyomvonal részben szerkeszhetjük meg. Ehhez viszont előtte létre kell hozni a helyek részben a pontokat.
+Ha az útvonalhoz olyan pontot akarunk rendelni, ami nincs rajta az útvonalon, hanem kitérőként érhető el,
+akkor ahhoz leágazást kell létrehozni és becsatolni úgy, hogy név szerint a leágazás végét nevezzük meg útpontnak,
+de az út nyomvonalába ezt a pontot a leágazás kezdőpontjára helyezzük el.
+<br><br>
+
+Így tehát a létrehozás menete:
+<ol>
+  <li>Létrehozzuk a Hely panelen az útpontokat, azokat amelyeket nevesíteni akarunk az útvonal mentén, s még nincsnek bent az adatbázisban.
+      Ha egy ponton több útvonal halad át, akkor azt itt csak egyszer kell létrehozni és a több útvonal hivatkozik ugyanarra a helyre.
+  </li>
+  <li>Létrehozzuk az útvonal objektumot az Útvonal panelen, az útvonal alapadataival.
+  </li>
+  <li>A létrehozott útvonalhoz megszerkesztjük a nyomvonalat a Nyomvonal panelen,
+      azaz összeállítjuk, hogy az útvonal milyen helyeket milyen sorrendben érint és
+      e helyek között milyen távon, milyen nyomvonalon vezet. Ha egy pont leágazással
+      érhető el, akkor:
+      <ul>
+          <li>Úgy illesztjük be a nyomvonalba, hogy a nyomvonali (pl. táv) adatokat
+              a leágazás helyéig ill. a rákövetkező útponthoz a leágazás helyétől számítjuk
+              (úgy mintha a leágazással elérhető pont az útvonalon lenne a leágazás helyén).
+              Ez a legegyszerűbben úgy tehető meg, hogy először létrehozzuk a leágazás helyét
+              a nyomvonalban, majd rákövetkező útpontként a leágazáson elérhető pontot, nullás
+              táv-adatokkal az előzőhöz képest. A nyomvonalban rákövetkező útponthoz pedig
+              a leágazás helyétől továbbvezető nyomvonal adatait írjuk be, azaz oda és vissza is
+              kihagyva a leágazás hosszát, mivel az nem része az útvonal nyomvonalának, hanem majd a
+              leágazás kiválasztásával kerül külön hozzárendelésre.
+          </li>
+          <li>Ha a leágazás nem egy másik, meglévő (már létrehozott) útvonal mentén vezet,
+              akkor létre kell hozni egy leágazó útvonalat hozzá (ld. 1-3 pontok),
+              ami a leágazás útvonalbeli helyétől a leágazással elérhető célpontig vezet.
+          </li>
+          <li>A Leágazás panelen létrehozunk egy leágazást, melyben megadjuk, hogy a leágazás melyik útvonal
+              mentén vezet, honnan hova és milyen hosszon.
+          </li>
+          <li>A fent létrehozott leágazás objektumot a Nyomvonal panelre visszatérve hozzárendeljük
+              az leágazásként feltüntetett nyomvonalponthoz.
+          </li>
+      </ul>
+  </li>
+</ol>
+A létrehozott új útvonal és a nyomvonalpontjai is kapnak egy-egy egyedi azonosítót,
+amelyekre negatív előjellel hivatkozva a fordított irányú (a szerkesztett nyomvonalhoz képest visszafelé)
+változat is lekérdezhető, használható (pl. ld. lejjebb, útszakasz vagy tábla definiálásakor,
+vagy a böngészőben megjelenítéskor). A visszafelé irány követi az oda irány minden aktuális szerkesztését,
+amaz külön nem szerkeszthető.
+
+<h2>Útvonalak útszakaszainak definiálása</h2>
+
+Egy már létrehozott útvonalhoz tetszőleges szakaszokat, szakaszolást definiálhatunk, azaz
+a nyomvonal tetszőleges nevesített (azaz a nyomvonalban feltüntetett) pontjától tetszőleges másik (későbbi) pontjáig kijelölhetjük,
+hogy az az útvonal egy szakasza, hozzá egy paramétert és értéket rendelhetünk, mely
+az útszakasz jellegét, jelentését határozza meg. Így lehetőség van egy-egy valódi útvonalat
+a maga teljes hosszában egy útvonalként tárolni, miközben lényegében tetszőleges részéhez
+hozzárendelhetünk valamilyen adatot, nincs szükség az útvonal tényleges szétdarabolására az adatbázisban.
+<br><br>
+
+Egy-egy útvonalhoz tetszőleges számú szakasz létrehozható, akár átfedésekkel.
+Meghatározott kezdő- ill. végpont
+hiányában a szakasznak a teljes útvonal mindenkori kezdő- ill. végpontja számít.
+Az útvonal valamely adata (pl. kerekített hossz, az útvonal
+turistautak.hu-n lévő megfelelőjének azonosítója) is tárolható szakaszparaméterként,
+külön szakaszt létrehozva ezen adathoz.
+<br><br>
+
+Szakaszparaméter nevek pl.:
+        <ul>
+            <li>etap - napi szakasz, értéke a napi szakasz azonosítója</li>
+            <li>oragnization - az útvonal adott részét kezelő szervezet</li>
+            <li>region, area - az útvonal adott része a paraméterben lévő régión ill. térségen vezet át</li>
+            <li>established - az útvonal adott része a paraméterben megadott időben létesült</li>
+            <li>length_slope - az útvonal hossza (jelenleg csak teljes útvonalhoz)</li>
+            <li>tuhu_route - az útvonal turistautak.hu-s megfelelője (jelenleg csak teljes útvonalhoz)</li>
+            <li>... - bármi más is lehet, amit az útvonalak szerkesztője megad</li>
+        </ul>
+
+A szakasz azért célszerű, mert csupán hivatkozik az útvonalra és az amentén kiválasztott kezdő- és végpontra,
+s a szakasz nyomvonalát az útvonal mindenkori nyomvonala határozza meg. Ha pl. egy útvonalhoz létrehozunk
+többféle szakaszolást, pl. napi szakaszokat, régiós felosztást vagy egyebet, akkor azok mindegyike ugyanazokra
+az útvonal-nyomvonal adatokra hivatkozik, így ha változik a nyomvonal valamely része, adata, esetleg egy közbülső
+útpontot törölnek vagy újat szúrnak be, az automatikusan a szakaszoknál így látszani fog.
+<br><br>
+
+A szakaszolás további előnye, hogy könnyű kezdő-végpontot változtatni. Ha egy napi szakaszhatárt odébb szeretnénk
+tenni, csak annyi a dolog, hogy a két érintett napi szakasz adatánál átállítjuk a kezdő/végpontot. Az útvonal egészének,
+a nyomvonalnak az adataihoz nem kell hozzányúlni, mivel az nem változik.
+<br><br>
+
+A szakaszokat az Útszakasz panelen hozhatjuk létre, a már meglévő útvonalakból és nyomvonalukból kiindulva, a kezdő- és végpont kiválasztásával.
+
+<h2>Útjelző táblák és létrehozásuk, útvonalakhoz rendelésük</h2>
+
+Az útjelző tábla általános fogalom: bármely útjelző elem ide tartozhat, pl. a tábla oszlopa
+vagy csupán útjelzést hordozó tereptárgy is. Az útirányjelző táblákhoz van külön "támogatás" is,
+azaz ezen táblák tartalmát iránysoronként hozzá is rendelhetjük az adott útvonalhoz, lehetővé téve,
+hogy az adatokat számítsuk ill. összevessük a mindenkori aktuális nyomvonal adatokból számítottakkal.
+<br><br>
+
+Egy útjelző táblát (elemet) mindig egy adott helyhez (a Hely panelen szereplő pont) tudunk rendelni.
+Az útirányjelzők hierarchiát alkotnak, ami fizikai összetartozást jelent, pl. egy táblaoszlop "tartalmazza"
+a rajta lévő táblákat, vagy egy nagyobb tábla kisebb paneljei külön "altáblákként" hozhatók létre. Ezen összerendelést
+azáltal adhatjuk meg, hogy a táblának megadjuk a fölérendeltjét.
+
+Egy oszlopon lévő útirányjelző táblák létrehozásának menete lehet:
+<ol>
+    <li>Létrehozzuk az útvonalakat és nyomvonalaikat, amikre az útirányjelzők vonatkozni fognak, ld. fent.</li>
+    <li>Létrehozzuk a tábla helyét a Hely panelen, ha még nincs meg és (javasoltan) beillesztjük a nyomvonal(ak)ba.</li>
+    <li>Létrehozzuk a Tábla panelen a táblaoszlopot, hozzárendelve az adott helyhez.</li>
+    <li>Létrehozzuk a Tábla panelen az útirányjelzőket, egyelőre üres tartalommal, hozzárendelve az adott helyhez és a táblaoszlopot megjelölve fölérendeltként.</li>
+    <li>Az útirányjelző táblákhoz iránysorokat rendelünk, melyeknél megadjuk mely útvonalra vonatkozik és a nyomvonal mely pontjától mely pontjáig.</li>
+    <li>Az útirányjelző táblák iránysorainak adatait kitöltjük, a számított értékek alapján.</li>
+    <li>Létrehozzuk a Tábla panelen az oszlop többi tábláját, ha van, tartalmukat kitöltve (pl. helymegjelölő, tájékoztató/figyelmeztető stb.) és hozzárendeljük az adott helyhez és az oszlophoz.</li>
+</ol>
+
+<h2>Listázó és szerkesztő panelek</h2>
+
+A panelek általános használatához ld. fent az első fejezetet, az adattartalom magyarázatában
+előzetes segítséget, szemléltetést nyújtanak a fenti, létrehozásra votankozó részek.
+Itt csak az egyes objektumtípusok megjelenítendő, szerkeszthető adatairól és azok
+kapcsolatairól szólunk.
+
+<h3>Hely</h3>
+
+A helyek keresési/szűrési szempontjai: név (vagy rész), régió, csoport. A régió és
+csoport listák automatikusan bővülnek, ha új érték kerül az adatbázisba.
+<br><br>
+
+A lista (táblázat) oszlopai:
+<ul>
+    <li>Hely# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá</li>
+    <li>Név</li>
+    <li>Pikto - piktogramok megnevezéseinek felsorolása, amik az adott helyre vonatkozó látnivalókra, szolgáltatásokra utalnak</li>
+    <li>Tuhu POI# - a turistautak.hu megfelelője a helynek, a linkre kattintva bejön a turistautak.hu POI lapja</li>
+    <li>URL - a pont linkje, honlapja (ha van, tetszőleges lehet)</li>
+    <li>Fölérendeltje - a helyek hierarchiába szervezhetők, egy már meglévő "nagyobb" hely
+        alá kisebb helyek, részek rendelhetők (pl. Budapest lehet egy nagyobb hely, azon
+        belül lehet Belváros vagy Szt.István bazilika, stb.). [Többek közt a táblázás
+        konzisztenciájánál lehet jelentősége, ui. ha egy nagyobb helyet írunk ki valahol egy útirányjelző táblára,
+        akkor ha később annak egy alárendeltjét írjuk ki, a rendszer konzisztens marad,
+        míg ha nincs meg az alá-fölé rendelési kapcsolat a két hely között, akkor úgy
+        tűnik fel, hogy a nagyobb helyet lehagytuk egy következő tábláról még mielőtt elértük volna.]
+    </li>
+    <li>Régió - nagyobb földrajzi egység</li>
+    <li>Település</li>
+    <li>Csoport - a helyek csoportokba rendezhetők, amik kifejezhetik az adatkezelés szempontjából különálló helyeket,
+        pl. projekt vagy egyben kezelendő térség, úthálózat(rész), esetleg az adott utakat fenntartó szervezet szerint. [Ez lehet egy későbbi
+        verzióban a jogosultság kezelés alapja is.] Nem szükséges, de köthető földrajzi egységhez is.
+    </li>
+    <li>Térkép - ha vannak megadva koordináták, a turistautak.hu térképén mutatja a helyet</li>
+    <li>Szerkeszt - az adott elem kifejtése a jobb oldalon, szerkesztésre / törlésre</li>
+</ul>
+
+Adatmezők a szerkesztő panelen:
+<ul>
+    <li>Hely# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá (nem szerkeszthető)</li>
+    <li>Név</li>
+    <li>Név2, Név3 - alternatív nevek (pl. rövid vagy hosszabb név, esetleg más nyelvű; táblázáshoz ajánlhatók ha más formában (is) feltüntetendő a név)</li>
+    <li>Pikto - piktogramok megnevezéseinek felsorolása, amik az adott helyre vonatkozó látnivalókra, szolgáltatásokra utalnak (egyszerű vesszővel elválasztott felsorolás)</li>
+    <li>Tuhu POI# - a turistautak.hu megfelelője a helynek, POI azonosító számként</li>
+    <li>Omp POI# - az openmaps.eu megfelelője a helynek, POI azonosító számként</li>
+    <li>Szél., Hossz. - földrajzi koordináták, fokban, tizedes ponttal max. 5 tizedesjegyig</li>
+    <li>Magasság - tengerszint feletti magasság egész méterben</li>
+    <li>URL - a pont linkje, honlapja (ha van, tetszőleges lehet)</li>
+    <li>Kategóriák - a pont jellegére utaló kategóriák (tetszőlegesek lehetnek, felsorolás) [későbbi használatra]</li>
+    <li>Leírás - tetszőleges leírás a pontról</li>
+    <li>Alap prioritás - a pont (hely) alapértelmezett fontossága (1-10 javasolt, 10 a legfontosabb) az úthálózatban, táblázáshoz, nyomvonal-tagoláshoz (útvonalanként változthatható)</li>
+    <li>Fölérendeltje - a helyek hierarchiába szervezhetők, egy már meglévő "nagyobb" hely
+        alá kisebb helyek, részek rendelhetők (pl. Budapest lehet egy nagyobb hely, azon
+        belül lehet Belváros vagy Szt.István bazilika, stb.).
+    </li>
+    <li>Virtuális - A virtuális pont valóságban nem meghatározott pont, egy nagyobb kategória, ami több
+        pont fölérendeltje lehet (pl. egy nagy város, vagy térség, ha nem akarjuk egy pontként megjeleníteni).
+    </li>
+    <li>Ország, Régió, Település - földrajzi egységek</li>
+    <li>Területgazda, Hrsz - telekkönyvi adatok (ha rendelkezésre áll)</li>
+    <li>Csoport - a helyek csoportokba rendezhetők, amik kifejezhetik az adatkezelés szempontjából különálló helyeket,
+        pl. projekt vagy egyben kezelendő térség, úthálózat(rész), esetleg az adott utakat fenntartó szervezet szerint. [Ez lehet egy későbbi
+        verzióban a jogosultság kezelés alapja is.] Nem szükséges, de köthető földrajzi egységhez is. Tetszőleges név lehet.
+    </li>
+</ul>
+
+<h3>Útvonal</h3>
+
+Az útvonalak keresési/szűrési szempontjai: név/kód/leírás (vagy rész), útjelzés, hely.
+Az útjelzés lista automatikusan bővül, ha új érték kerül az adatbázisba.
+A helyek külön ablakban listázódnak (v.ö. fent a Hely fejezettel), a mellettük lévő
+checkboxszal válaszható ki egy hely.
+<br><br>
+
+A lista (táblázat) oszlopai:
+<ul>
+    <li>Út# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá</li>
+    <li>Útkód - útvonal-azonosító, tetszőleges szöveges adat</li>
+    <li>Útjelzés - az útvonal terepi jelzése, piktogramként megjenelítve (ha van)</li>
+    <li>Név - nevesített útvonal esetén annak neve</li>
+    <li>Leírás - rövid leírás az útvonalról, mely utalhat a nyomvonalra is</li>
+    <li>Megjegyzés</li>
+    <li>Szerkeszt - az adott elem kifejtése a jobb oldalon, szerkesztésre / törlésre</li>
+</ul>
+
+Adatmezők a szerkesztő panelen:
+<ul>
+    <li>Út# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá (nem szerkeszthető)</li>
+    <li>Útkód - útvonal-azonosító, tetszőleges szöveges adat</li>
+    <li>Útjelzés - az útvonal terepi jelzése, szövegesen (ld. <a href="http://turistautak.hu/wiki/Turistajelz%C3%A9sek_sz%C3%B6veges_megjelen%C3%ADt%C3%A9se">turistautak.hu Wiki</a>)</li>
+    <li>Haszn.mód - modalitás, gyalogos vagy kerékpáros (vagy más)</li>
+    <li>Név - nevesített útvonal esetén annak neve</li>
+    <li>Név kieg. - a név kiegészítése az előre irányhoz, pl. a Mária útnál lehet "Csíksomlyó felé"</li>
+    <li>Név kieg. visszafelé - a név kiegészítése a vissza irányhoz, pl. a Mária útnál lehet "Mariazell felé"</li>
+    <li>Leírás - rövid leírás az útvonalról, mely utalhat a nyomvonalra is (előre irány)</li>
+    <li>Leírás - rövid leírás az útvonalról, mely utalhat a nyomvonalra is (vissza irány)</li>
+    <li>Megjegyzés</li>
+    <li>Geodb Service - a nyomvonal generálásához használható térinformatikai szolgáltatás (többnyire turistautak.hu) [jövőbeni használatra]</li>
+</ul>
+
+Mj. útvonalnál jelenleg nincs földrajzi besorolás, vagy csoportba sorolás, mivel egy útvonal
+több térségen haladhat át, több csoportot érinthet. A szakaszolás (ld. Útszakasz) ad lehetőséget arra, hogy ilyen
+jellegű adatokat az útvonal egészére vagy annak egy részére megadjunk, de a földrajzi besorolás az útvonal által
+érintett helyekből is jórészt következik.
+<br><br>
+Mj.: Minden útvonalhoz létrejön egy fordított irányú változat is, melynek azonosítója
+megegyezik az eredeti útvonallal, csak negatív előjellel. A név kieg. és a leírás mezők
+előre-vissza irányú változatai abban megcserélődnek.
+
+<h3>Nyomvonal</h3>
+
+Itt adhatjuk meg és szerkeszthetjük, hogy melyik útvonal merre vezet. Új útpontot
+felvehetünk (beilleszthetünk) bármelyik pont elé, vagy az útvonal végére, folytatásként.
+Utóbbi esetben a táblázat után lévő "További Nyomvonal" gombra kell kattintanunk.
+
+A lista (táblázat) oszlopai:
+<ul>
+    <li>Nyomv.pont sorszám - útpont sorszáma a nyomvonalban, automatikusan rendelődik hozzá</li>
+    <li>Név - Pont neve az útvonal mentén (többnyire a hozzá tartozó hely neve, de nem kötelezően,
+        pl. egy elágazásban ahol A és B felé vezet 1-1 útvonal, lehet hogy az A felé vezető útvonalon
+        az elágazás neve "B-i elágazás" lesz, míg a B felé vezető útvonalon "A-i elágazás").
+        A név dőlt betűvel és [Leágazás] kiegészítéssel jelenik meg, ha a pont nem közvetlenül az útvonalon, hanem leágazáson található.
+    </li>
+    <li>Táv - az előző nyomvonalponttól (útponttól) való távolság az útvonal mentén m-ben(!). Ha az előző vagy a sorban lévő pont leágazáson található, akkor a leágazás útvonali helyét (kezdetét) kell figyelembe venni, a kitérőt itt nem beleszámítva.</li>
+    <li>Szintemelkedés, szintereszkedés - az előző útponttól (mint fent), pozitív egész m-ben</li>
+    <li>Menetidő oda ill. vissza - az előző útponttól (mint fent) ill. innen az előző útpontig visszafelé irányban, egész percben</li>
+    <li>Szerkeszt - az adott elem kifejtése a jobb oldalon, szerkesztésre / törlésre</li>
+    <li>Beszúr elé - beszúrás az adott elem elé (figyelni kell, hogy ekkor a nyovmonal adatok [pl. táv-idő stb.] is értelemszerűen módosítandók, mivel a korábbi nyomvonalrész ketté bomlik!)</li>
+</ul>
+
+Adatmezők a szerkesztő panelen:
+<ul>
+    <li>Nyomv.pont# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá (nem szerkeszthető)</li>
+    <li>Útvonal - mely útvonalhoz tartozik (nem szerkeszthető)</li>
+    <li>Nyomv.pont sorszám - útpont sorszáma a nyomvonalban, automatikusan rendelődik hozzá (nem szerkeszthető)</li>
+    <li>Leágazás - Ha a szóban forgó pont nem pontosan az útvonalon található, hanem leágazáson érhető el, akkor itt kell kiválasztani a leágazást (ld. Leágazás fejezet).
+        Csak azok jelennek meg a listában, amelyek végpontja egybeesik a kiválasztott hellyel [először a helyet kell kiválasztani és elmenteni]</li>
+    <li>Hely - az útvonalpont helye a Hely panelen létrehozott pontok közül kiválasztva</li>
+    <li>Név - Pont neve az útvonal mentén (többnyire a hozzá tartozó hely neve, de nem kötelezően,
+        pl. egy elágazásban ahol A és B felé vezet 1-1 útvonal, lehet hogy az A felé vezető útvonalon
+        az elágazás neve "B-i elágazás" lesz, míg a B felé vezető útvonalon "A-i elágazás").
+        A név dőlt betűvel és [Leágazás] kiegészítéssel jelenik meg, ha a pont nem közvetlenül az útvonalon, hanem leágazáson található.
+    </li>
+    <li>Pikto - piktogramok megnevezéseinek felsorolása, amik az adott helyre vonatkozó látnivalókra, szolgáltatásokra utalnak (v.ö. Hely fejezettel)</li>
+    <li>Prioritás - a pont (hely) fontossága az útvonal mentén (1-10 javasolt, 10 a legfontosabb) a táblázáshoz, nyomvonal-tagoláshoz (v.ö. Hely fejezettel)</li>
+    <li>Prioritás visszafelé - a pont (hely) fontossága az útvonal mentén visszafelé irányban nézve</li>
+    <li>Útjelzés - az előző út(nyomvonal)ponttól idáig vezető terepi jelzés szövegesen, főként ha különbözik az útvonal alap jelzésétől (ld. <a href="http://turistautak.hu/wiki/Turistajelz%C3%A9sek_sz%C3%B6veges_megjelen%C3%ADt%C3%A9se">turistautak.hu Wiki</a>) [leágazás nem számít, azt a leágazás adatainál kell megadni!]</li>
+    <li>Haszn.mód- az előző út(nyomvonal)ponttól idáig vezető nyomvonal modalitása (gyalogos, kerékpáros) [leágazás nem számít, azt a leágazás adatainál kell megadni!]</li>
+    <li>Táv (vetületi), Táv - az előző nyomvonalponttól (útponttól) való távolság az útvonal mentén m-ben(!). Ha az előző vagy a sorban lévő pont leágazáson található, akkor a leágazás útvonali helyét (kezdetét) kell figyelembe venni, a kitérőt itt nem beleszámítva.
+        [A vetületi táv nem kötelező, tájékoztató adat, a valós táv adatot használjuk általában.]
+    </li>
+    <li>Szintemelkedés, szintereszkedés - az előző útponttól (mint fent), pozitív egész m-ben</li>
+    <li>Menetidő oda ill. vissza - az előző útponttól (mint fent) ill. innen az előző útpontig visszafelé irányban, egész percben</li>
+    <li>TuHu szakaszok, (/visszafelé) - az előző útponttól (mint fent), [ill. innen odáig a visszafelé irányúhoz] vezető szakasz aktuális azonosító-sorozata (itiner) a turistautak.hu-n. Ha ez meg van adva, akkor lehet a böngésző felületen itinert kérni.</li>
+    <li>Koord.sorozat (/visszafelé) - az előző útponttól (mint fent), [ill. innen odáig a visszafelé irányúhoz] vezető szakasz koordináta-sorozata [nem haszn., formátum nem tisztázott még]</li>
+    <li>Megjegyzés - (tetszőleges szöveg)</li>
+</ul>
+
+Megjegyzés: a táv-idő adatok a turistautak.hu útvonaltervezőjével számolhatók, a tervezéskor a "lehetőleg" kijelölt útvonalon tervezést válasszuk.
+[Későbbi fejlesztési terv, hogy gombnyomásra "meghívjuk" az automatikus útvonaltervezőt és így kapjuk meg ezeket.]
+
+<h3>Leágazás</h3>
+
+Itt adhatjuk meg és szerkeszthetjük az útvonal leágazásokat, azaz definiálhatjuk azon nyomvonal-részeket,
+amelyek mentén egyes útvonalakon a nem közvetlenül az út mentén, hanem leágazással elérhető pontok elérhetők az útvonalról leágazva.
+Egy leágazás több útvonalhoz is hozzárendelhető.
+
+A lista (táblázat) oszlopai:
+<ul>
+    <li>Leág.# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá</li>
+    <li>Útvonal mentén - mely útvonal mentén vezet a leágazás</li>
+    <li>Tól - az útvonalon mely pontból indul (ez lesz a leágazás kezdőpontja, ami rajta van a leágazást hivatkozó útvonalon)</li>
+    <li>Ig - az útvonalon mely pontig tart (ez lesz a leágazás végpontja, azaz az a pont, ami nincs rajta a leágazást hivatkozó útvonalon, de annak útpontjaként szerepeltetjük a nyomvonalban)</li>
+    <li>Útjelzés mentén - a leágazás útjelzése piktogramként (ha van)</li>
+    <li>Táv - A leágazás hossza m-ben.</li>
+    <li>Megjegyzés - (tetszőleges szöveg)</li>
+    <li>Szerkeszt - az adott elem kifejtése a jobb oldalon, szerkesztésre / törlésre</li>
+</ul>
+
+Adatmezők a szerkesztő panelen:
+<ul>
+    <li>Nyomv.pont# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá</li>
+    <li>Útvonal mentén - mely útvonal mentén vezet a leágazás (ez különbözik a hivatkozó útvonaltól, azaz amihez hozzárendeljük majd a leágazást)</li>
+    <li>Tól - az útvonalon mely pontból indul (ez lesz a leágazás kezdőpontja, ami rajta van a leágazást hivatkozó útvonalon)</li>
+    <li>Ig - az útvonalon mely pontig tart (ez lesz a leágazás végpontja, azaz az a pont, ami nincs rajta a leágazást hivatkozó útvonalon, de annak útpontjaként szerepeltetjük a nyomvonalban)</li>
+    <li>Útjelzés mentén - a leágazás útjelzése piktogramként (ha van) (ld. <a href="http://turistautak.hu/wiki/Turistajelz%C3%A9sek_sz%C3%B6veges_megjelen%C3%ADt%C3%A9se">turistautak.hu Wiki</a>)</li>
+    <li>Haszn.mód - modalitás, gyalogos vagy kerékpáros (vagy más)</li>
+    <li>Táv (vetületi), Táv - A leágazás hossza m-ben(!).
+        [A vetületi táv nem kötelező, tájékoztató adat, a valós táv adatot használjuk általában.]
+    </li>
+    <li>Szintemelkedés, szintereszkedés - a leágazás mentén, pozitív egész m-ben</li>
+    <li>Menetidő oda ill. vissza - a leágazás mentén ill. visszafelé irányban, egész percben</li>
+    <li>TuHu szakaszok, (/visszafelé) - a leágazásnak megfelelő útszakasz aktuális azonosító-sorozata oda és vissza irányban külön (itiner) a turistautak.hu-n. Ha ez meg van adva, akkor lehet a böngésző felületen itinert kérni a leágazásról.</li>
+    <li>Koord.sorozat (/visszafelé) - a leágazás koordináta-sorozata oda és vissza irányban külön [nem haszn., formátum nem tisztázott még]</li>
+    <li>Megjegyzés - (tetszőleges szöveg)</li>
+</ul>
+
+Megjegyzés: a táv-idő adatok az útvonal-nyomvonal adatok alapján, valamint a turistautak.hu útvonaltervezőjével számolhatók (a tervezéskor a "lehetőleg" kijelölt útvonalon tervezést válasszuk).
+[Későbbi fejlesztési terv, hogy gombnyomásra kapjuk meg ezeket, valamint hogy a leágazás-kezelést egyszerűsítsük.]
+
+<h3>Útszakasz</h3>
+
+Az útszakaszok keresési/szűrési szempontjai: útvonal, paraméter.
+<br><br>
+
+Az útszakasz paramétere lehet pl.:
+        <ul>
+            <li>etap - napi szakasz, értéke a napi szakasz azonosítója</li>
+            <li>oragnization - az útvonal adott részét kezelő szervezet</li>
+            <li>region, area - az útvonal adott része a paraméterben lévő régión ill. térségen vezet át</li>
+            <li>established - az útvonal adott része a paraméterben megadott időben létesült</li>
+            <li>length_slope - az útvonal hossza (jelenleg csak teljes útvonalhoz)</li>
+            <li>tuhu_route - az útvonal turistautak.hu-s megfelelője (jelenleg csak teljes útvonalhoz)</li>
+            <li>... - bármi más is lehet, amit az útvonalak szerkesztője megad</li>
+        </ul>
+
+A lista (táblázat) oszlopai:
+<ul>
+    <li>Útszakasz# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá</li>
+    <li>Útvonal - mely útvonalnak a szakasza ez</li>
+    <li>Tól - az útvonalon mely pontból indul (ha üres, akkor az útvonal mindenkori kezdőpontjától)</li>
+    <li>Ig - az útvonalon mely pontig tart (ha üres, akkor az útvonal mindenkori végpontjáig)</li>
+    <li>Parméter, Érték - a szakasz jellegét, jelentését meghatározó paraméter neve és értéke (ld. fent)</li>
+    <li>Egyirányú - ha +, akkor csak egyirányúnak tekintendő (pl. menetidő vagy útleírás esetén lehet), ha - akkor kétirányú (pl. térség, táv, karbantartó)</li>
+    <li>Leágazásokkal - ha +, akkor a leágazások beleszámítanak, ha - akkor nem számítanak bele</li>
+    <li>Szerkeszt - az adott elem kifejtése a jobb oldalon, szerkesztésre / törlésre</li>
+</ul>
+
+Adatmezők a szerkesztő panelen:
+<ul>
+    <li>Útszakasz# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá (nem szerkeszthető)</li>
+    <li>Útvonal - mely útvonalnak a szakasza ez (az útvonalnál megadott nymovonalhoz képest visszafelé irányú szakaszhoz válasszuk a negatív előjelű útvonal változatot)</li>
+    <li>Tól - az útvonalon mely pontból indul (ha üres, akkor az útvonal mindenkori kezdőpontjától)</li>
+    <li>Ig - az útvonalon mely pontig tart (ha üres, akkor az útvonal mindenkori végpontjáig)</li>
+    <li>Parméter, Érték - a szakasz jellegét, jelentését meghatározó paraméter neve és értéke (ld. fent, tetszőleges szöveg lehet)</li>
+    <li>Egyirányú - ha bepipálva, akkor csak egyirányúnak tekintendő (pl. menetidő vagy útleírás esetén lehet), különben kétirányú (pl. térség, táv, karbantartó)</li>
+    <li>Leágazásokkal - ha bepipálva, akkor a leágazások beleszámítanak, különben nem számítanak bele</li>
+    <li>Útszakasz számított adatai - a szakasz azonosítója, útjelzése, hossza és menetideje az aktuális útvonal-nyomvonal adatokból kiszámítva (nem szerkeszthető)</li>
+</ul>
+
+Mj.: Minden kétirányúnak definiált útszakaszhoz létrejön egy fordított irányú változat is, melynek azonosítója
+megegyezik az eredetiével, csak negatív előjellel.
+
+<h3>Tábla</h3>
+
+Mindig a kiválasztott helyhez tartozó táblák (útjelző elemek) listázódnak.
+<br><br>
+
+A tábla típusa lehet pl.:
+        <ul>
+            <li>tablaoszlop - oszlop, melyre további táblák helyezhetők fel (rendelhetők hozzá)</li>
+            <li>helymegjelolo - egyszerű helymegjelölő tábla</li>
+            <li>utiranyjelzo - útirányjelző tábla, melyhez útiránysorok tartozhatnak</li>
+            <li>... - bármi más is lehet, amit a szerkesztő megad, pl. útjelző tereptárgy, útvonaljelző, panel, információs, projekttábla, spec.útjelzés stb.</li>
+        </ul>
+
+A tábla státusa lehet pl.:
+        <ul>
+            <li>wish - előzetes terv, "vágy", javaslat</li>
+            <li>planned - tervezett</li>
+            <li>installed - kihelyezett/felszerelt</li>
+            <li>IMPORT - excelből importált adat, letisztázandó</li>
+            <li>... - bármi más is lehet, amit a szerkesztő megad, pl. útjelző tereptárgy, útvonaljelző, panel, információs, projekttábla, spec.útjelzés stb.</li>
+        </ul>
+
+Útirányjelző tábla iránysorának típusa lehet:
+        <ul>
+            <li>dst_normal - normál</li>
+            <li>dst_referring - utaló sor (kitérőre, más betűvel szedendő)</li>
+            <li>heading - fejléc-sor, útvonal névvel/bannerrel</li>
+            <li>remark - megjegyzés az előző sorhoz (pl. járhatósági tudnivaló, kiegészítés, kis betűvel szedendő)</li>
+            <li>tail - a tábla alján lévő kisbetűs sor, mely azonosító számot, esetleg karbantartót, webcímet stb. tartalmazhat</li>
+        </ul>
+
+A lista (táblázat) oszlopai:
+<ul>
+    <li>Tábla# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá</li>
+    <li>Táblakód - Tetszőleges azonosító kód</li>
+    <li>Táblatípus / Irány - Táblatípus (ld. fent), útirányjelző esetén balos/jobbos irányformátum</li>
+    <li>Tartalom - a tábla szöveges tartalma. Útirányjelző tábla esetén az útiránysorok is itt listázódnak az alábbi adatokkal:
+        <ul>
+            <li>Tábla# / sorszám a táblán belül</li>
+            <li>Útjelzés - szövegesen</li>
+            <li>Cél neve</li>
+            <li>Táv - km</li>
+            <li>Menetidő - percben</li>
+            <li>Szerkesztés - az útiránysor kifejtése a jobb oldalon, szerkesztésre / törlésre</li>
+            <li>Új útiránysor - új útiránysor létrehozása az adott táblán</li>
+        </ul>
+    </li>
+    <li>Státusz - a tábla státusa, ld. fent</li>
+    <li>Szerkeszt - az adott elem kifejtése a jobb oldalon, szerkesztésre / törlésre</li>
+</ul>
+
+Adatmezők a tábla szerkesztő panelen:
+<ul>
+    <li>Tábla# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá (nem szerkeszthető)</li>
+    <li>Táblakód - Tetszőleges azonosító kód</li>
+    <li>Hely - Tábla helye (ha nem adjuk meg, a tábla nem lesz listázható, megjeleníthető!)</li>
+    <li>Szél., Hossz - Tábla helyének koordinátái [nem haszn.]</li>
+    <li>Táblatípus - a tábla típusa (ld. fent)</li>
+    <li>Irány - útirányjelző esetén balos/jobbos irányformátum</li>
+    <li>Irányszög - a tábla iránya, szöge az oszlopon</li>
+    <li>Anyag (kivitel) - fém, fa, stb. - tetsz. szöveg</li>
+    <li>Altípus - tetsz. szöveg [nem haszn.]</li>
+    <li>Tartalom - a tábla szöveges tartalma. Útirányjelző tábla esetén az útiránysorok nem itt szerepelnek, hanem külön rendelhetők hozzá a bal oldali panelen kattintva</li>
+    <li>Státusz - a tábla státusa, ld. fent</li>
+    <li>Állag - a tábla állapota, tetsz. szöveg (javasolt: egyszavas kategóriák)</li>
+    <li>Kihelyezve, Ellenőrizve - a tábla kihelyezésének, legutóbbi bejárásának (ellenőrzésének) dátuma</li>
+    <li>Fenntartó - a tábla fenntartója (tetsz.szöveg), szervezet</li>
+    <li>Támogató - a tábla finanszírozója (tetsz.szöveg)</li>
+    <li>Megjegyzés - (tetsz.szöveg)</li>
+    <li>Fölérendeltje - Az útirányjelzők hierarchiát alkotnak, ami fizikai összetartozást jelent, pl. egy táblaoszlop "tartalmazza"
+        a rajta lévő táblákat, vagy egy nagyobb tábla kisebb paneljei külön "altáblákként" hozhatók létre. Ezen összerendelést
+        azáltal adhatjuk meg, hogy a táblának megadjuk a fölérendeltjét. A lenyíló listában azok a táblák láthatók, amelyek az adott kiválasztott helyen vannak.
+    </li>
+    <li>Virtuális - ha a valóságban nem különálló tábla, hanem valamely nagyobb táblának egy része, panelje</li>
+</ul>
+
+Adatmezők az útiránysor szerkesztő panelen:
+<ul>
+    <li>Útiránysor# - adatbázisbeli azonosító szám automatikusan rendelődik hozzá (nem szerkeszthető)</li>
+    <li>Tábla - mely táblához tartozik (azonosító, típus @ helyszín) (nem szerkeszthető)</li>
+    <li>Sorszám (táblán) - az útiránysor sorszáma a táblán belül (1-től kezdve)</li>
+    <li>Sortípus - a sor típusa (ld. fent - kötelező, alapértelmezésként a dst_normal-t írhatjuk be)</li>
+    <li>Elválasztó vonal fölötte - kell-e elválasztó vonalat húzni a sor fölé (akkor jelöljük be, ha a tábla elágazó
+        útvonalat jelöl és ennek a sornak a célpontja már nem az előző célponttól továbbhaladva érhető el, hanem előzőleg el kell hozzá ágazni)
+    </li>
+    <li>Útvonal - mely útvonalhoz tartozik a táblasor (az útvonalnál megadott nymovonalhoz képest visszafelé irányú szakaszhoz válasszuk a negatív előjelű útvonal változatot)</li>
+    <li>Tól - az útvonalon mely pontból indul, azaz hol van a tábla</li>
+    <li>Táv a ponttól, menetidő a ponttól - ha a tábla nem pontosan a fent kiválasztott pontban van, hanem tovább az útvonal mentén, akkor az eltolási adatokat itt adjuk meg (a távot méterben!, az időt percben)</li>
+    <li>Ig - az útvonalon mely célpontra mutat a táblasor</li>
+    <li>Tartalom (szöveg) - a célpont neve a táblán feltüntenendő formátumban</li>
+    <li>2. tartalom (szöveg) - kiegészítő szöveg a táblára (más, kisebb betűvel, kieg.infó)</li>
+    <li>Pikto - piktogramok megnevezéseinek felsorolása, amik az adott helyre vonatkozó látnivalókra, szolgáltatásokra utalnak (v.ö. Hely fejezettel)</li>
+    <li>Táv - a két pont közötti táv méterben(!) megadva</li>
+    <li>Menetidő - a két pont közötti menetidő percben megadva</li>
+    <li>Menetidő (kerekítve) - a két pont közötti menetidő kerekítve, javasolt pl. 30p felett 5 percre kerekíteni, 10 óra felett elhagyni - de tetszőleges lehet; ez fog megjelenni ténylegesen a táblán</li>
+    <li>Útjelzés - az útvonal terepi jelzése szövegesen (ld. <a href="http://turistautak.hu/wiki/Turistajelz%C3%A9sek_sz%C3%B6veges_megjelen%C3%ADt%C3%A9se">turistautak.hu Wiki</a>)</li>
+    <li>Haszn.mód - modalitás, gyalogos vagy kerékpáros (vagy más)</li>
+    <li>Rejtett - a táblasor nem jelenik meg a táblán (konzisztencia szempontból viszont létezőnek tekintendő, 
+        kivételes esetben lehet indokolt, ha valahol útközben egy "kisebb" tábla kerül ki mely nem tartalmazza az össes korábban kiírt célpontot)
+    </li>
+    <li>Technikai megjegyzés - (tetszőleges szöveg)</li>
+    <li>Útiránysor számított adatai - az iránysor azonosítója, útjelzése, a célpont neve, hossza és menetideje az aktuális útvonal-nyomvonal adatokból kiszámítva (nem szerkeszthető)</li>
+</ul>
+
+Megjegyzés: a táblasor létrehozásakor első lépésben nem kell kitöltenünk a táv-idő 
+adatokat. Ha elmentjük a táblasort és megnyitjuk szerkesztésre, alul a számított adatok 
+megjelennek és azok alapján beírhatjuk a pontos, aktuális adatokat. [Későbbi fejlesztésben 
+ezek generálhatók lehetnek akár egyszerre több táblára is.]
+
+<hr>
+
+<ul>
+    <li><a href="index.html">Vissza a dokumentáció tartalomjegyzékéhez</a></li>
+</ul>
+
+</body>

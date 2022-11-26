@@ -1,0 +1,21 @@
+
+#Options -Indexes
+IndexIgnore *
+
+#turistautak.hu:
+AuthUserFile /home/turistautak/www/users/modras/gyk/.htpasswd
+
+##venediger local:
+#AuthUserFile /home/andras/public_html/tuhu_dev/modras/gyk/.htpasswd
+
+AuthType Basic
+AuthName "GyalogutKataszter szerkeszto felulet"
+
+<LIMIT GET POST>
+require valid-user
+</LIMIT>
+
+<files ".htaccess">
+order allow,deny
+deny from all
+</files> 

@@ -1,0 +1,722 @@
+Excel import GyK-ba
+###################
+
+1. Az Útvonaltáblázat fület CSV-be exportálni.
+
+     1a. '-', '#HIÁNYZIK','#HIV!' és '#ÉRTÉK!' értékek átírása '' üres stringgé.
+	(search-and-replace, figyelni kell a kódtáblára és 
+	 a '-'nál a teljes egyezésre (;-; cseréje ;;-re))
+
+2. Importálás
+
+ 2.a. Importálni phpmyadmin-ból (charset cp1250 !), 
+     [unknown collation error lehet, de nem számít],
+     létrejön egy új tábla `TABLE ...` néven, `COL ..` oszlopokkkal. (pl.: `TABLE 18`)
+
+ 2.b. A tábla átnevezése és a collation átállítása minden oszlopra: (m53 a trail kódja, átírandó:)
+	
+	RENAME TABLE `TABLE ...` TO `IMPORT_TRAIL_m53` ;
+
+	Az alábbiak collation-jét átállítani utf8_hungarian_ci-re:
+	`COL 2`, `COL 3`, `COL 4`, `COL 5`, `COL 6`,
+	31,34,35, 38,41,42, 45,48,49, 
+	52,55,56, 59,62,63, 66,69,70, 
+	73,76,77, 80,81, 84,85, 
+	88,91,92, 95,96, 99,100
+
+####### innentől SQL script, átírandó: 
+# * útkód (m53) az aktuálisra (mindenben, táblanevekben is), 
+# * az út alapadatai az 5. pontban
+# * az projekt/régió előtag (EAOP) a 9. pontban
+# * további konstansok, pl. group, region, stb. szükség szerint...
+
+# Mj.: Ne legyen duplikát név a trail node-ok között a trail-en belül, mert elakad a feldolgozás. 
+#	Ha mégis van, figyeljünk majd a 4.b.ii. pontban, írjuk be kézzel az ott előírtat és folytassuk a beszúrást a következő id-tól.
+
+
+# 3. Adattisztítás: 
+
+# 3a. ahol a COL 2 és a COL 3 mindkettő üres vagy a COL 2 értékéhez 
+#     nincs megfelelő, vele egyenlő érték a COL 3-ban, azt töröljük.
+    DELETE FROM `IMPORT_TRAIL_m53` WHERE ((`COL 2` IS NULL OR `COL 2` = '') 
+                              AND (`COL 3` IS NULL OR `COL 3` = '')) 
+        OR NOT EXISTS (SELECT * 
+         FROM (SELECT t1.`COL 2` FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 
+                                      ON (t1.`COL 2` = t2.`COL 3` AND t1.`COL 2` != '' AND t2.`COL 3` != '')) t0
+         WHERE t0.`COL 2` IN (`IMPORT_TRAIL_m53`.`COL 2`,`IMPORT_TRAIL_m53`.`COL 3`));
+
+# 3b. üres értékek NULL-ra állítása a település, útpont esetén:
+     UPDATE `IMPORT_TRAIL_m53` SET `COL 4` = NULL WHERE `COL 4` = '';
+     UPDATE `IMPORT_TRAIL_m53` SET `COL 5` = NULL WHERE `COL 5` = '';
+
+# 3c. a végpont után szereplő sorok törlése:
+	CREATE TABLE tmp_1 AS
+	 SELECT t1.`COL 2` AS IDX FROM `IMPORT_TRAIL_m53` t1
+	 WHERE (t1.`COL 4` IS NULL OR t1.`COL 4` IN ('','…','-')) AND
+		CAST(t1.`COL 23` AS DECIMAL(4,1))
+		 = (SELECT MAX(CAST(`COL 23` AS DECIMAL(4,1))) FROM `IMPORT_TRAIL_m53`);
+	DELETE FROM `IMPORT_TRAIL_m53` 
+	 WHERE CONCAT(`COL 2`, `COL 3`) IN (SELECT IDX FROM tmp_1);
+	DROP TABLE tmp_1;
+
+# 4. NOI-k kiszedése és beillesztése:
+
+#   4a. kiszedés:
+
+    CREATE TABLE IMPORT_NOI_m53 AS 
+      SELECT 
+        `COL 2` AS IMP_m53_IDX, 
+        CONCAT_WS(', ', `COL 4`, `COL 5`, CASE WHEN CONCAT(`COL 4`,`COL 5`)='…' 
+						THEN CONCAT('(',`COL 2`,')') 
+						ELSE NULL 
+					  END) AS NAME,
+        `COL 4` AS TOWN,
+	`COL 6` AS PICTO,
+	`COL 7` AS ALT,
+	'' AS LAT, ##GPS COORD... - egyelore nem kell
+        '' AS LON, ##GPS COORD... - egyelore nem kell
+	`COL 9` AS TUHU_ID,
+	'Észak-Alföld' AS REGION, ## konstans default érték!
+	'MUTKE-EAOP' AS `GROUP`    ## konstans default érték!
+      FROM `IMPORT_TRAIL_m53` WHERE `COL 2` != '';
+
+#   4b. összevetés, beillesztés:
+#	 i. a noi táblában már meglévő noi-khoz:  (az egyszerű névegyezés finomítandó lehet régióval/group-pal !!!)
+#	    (az IMPORT_NOI_m53-ban a name collation-je átállítandó utf8_hungarian_ci-re!)
+#		SELECT * from IMPORT_NOI_m53 where name in (select name from noi);
+#		VAGY:
+#
+		SELECT noi_id, CONCAT(';IMP_m53_IDX=', IMPORT_NOI_m53.IMP_m53_IDX ,';'), IMPORT_NOI_m53.* 
+		FROM IMPORT_NOI_m53 JOIN noi USING (name);
+#
+#	    a description végére, ';'-vel elválasztva utána kell fűzni,
+#	    hogy 'IMP_m53_IDX=n;' ahol n helyére az IMPORT_NOI_m53.IMP_m53_IDX-ban szereplő értéket kell beírni, így jön
+#	    létre a kapcsolat. +aktualizáljuk a noi táblában a szóban forgó noi rekordját ha új információt
+#	    kapunk az IMPORT_NOI_m53 táblából.
+
+		UPDATE noi JOIN IMPORT_NOI_m53 using (name) 
+			SET noi.description = CONCAT(noi.description,';IMP_m53_IDX=', IMPORT_NOI_m53.IMP_m53_IDX ,';');
+
+#	ii. a noi táblában még nem szereplő új noi-kat szúrjuk be az IMPORT_NOI_m53 táblából:
+		INSERT INTO noi (name, town, picto, alt, lat, lon, tuhu_id, region, `group`, 
+			description)
+		SELECT name, town, picto, CASE WHEN alt=0 THEN NULL ELSE alt END, lat, lon, tuhu_id, region, `group`, 
+			CONCAT(';IMP_m53_IDX=',IMP_m53_IDX,';')
+		FROM IMPORT_NOI_m53
+		WHERE name not in (select name from noi); ## (az újak amiket i.-ben nem szúrtunk be)
+#	FIGYELEM !!! közben ami már szerepelt (duplicate name), 
+#		annál csak tegyük hozzá a noi.description végére ';IMP_m53_IDX=nn;', és úgy menjünk tovább 
+#		a beszúrással.
+#	iii. a duplikátumokat (azonos pont, de kül. néven) kiszűrhetjük most vagy akár később is, 
+#		NOI összevonással
+		
+
+# 5. Útvonal létrehozása, pl: 
+
+#  	    !!! itt írjuk át szükség szerint a konstansokat !!!
+
+	INSERT INTO trail
+		(trail_code, trailmark, modality, 
+		 name, name_ext, name_ext_rev, 
+		 description, 
+		 description_rev, 
+		 remark, 
+		 geodb_service)
+	VALUES
+		('m53', 'Sm+', 'gyalogos',
+		 'Mária út', '', '',
+		 'Nyírségi helyi Mária út Károlypusztától Bátorligetig',
+		 'Nyírségi helyi Mária út Bátorligettől Károlypusztáig (visszafelé irány)',
+		 '',
+		 'turistautak.hu');
+
+	##> a kapott trail_id-t kivehetjük belőle a későbbiekre: 
+
+	SELECT * FROM trail WHERE trail_code = 'm53';
+
+# 6. Trail branch-ek létrehozása (ahol kitérőn van az útpont):
+	INSERT INTO trail_branch (branch_trailmark, branch_modality, 
+				  branch_length_projection, branch_length_slope, 
+				  branch_ascent_to, branch_ascent_from,
+				  branch_minutes_to, branch_minutes_from,
+				  branch_remark)
+	SELECT 
+		t2.`COL 5`, 'gyalogos',
+		null, ROUND(REPLACE(t1.`COL 16`, ',', '.'), 1)*1000, 
+		ROUND(REPLACE(t1.`COL 17`, ',', '.'), 0), ROUND(REPLACE(t1.`COL 18`, ',', '.'), 0), 
+		ROUND(REPLACE(t1.`COL 21`, ',', '.'), 0), ROUND(REPLACE(t1.`COL 22`, ',', '.'), 0),
+		CONCAT(';IMP_m53_IDX=', t1.`COL 2`,';')
+	FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+	WHERE ROUND(REPLACE(t1.`COL 16`, ',', '.'), 1)*1000 > 0;
+
+    #(lehet már meglévő branch-re is hivatkozni egyébként, akkor csak írjuk hozzá a remarkhoz 
+    #	az IMP_m53_IDX-et a 4b. szerinti módon)
+
+# 7. Extra kitérők kinyerése: (későbbi, külön feldolgozásra)
+
+    CREATE TABLE IMPORT_EXTRA_BRANCH_m53 AS 
+      SELECT 
+        t1.`COL 2` AS FROM_IMP_m53_IDX, 
+        CONCAT_WS(', ', t1.`COL 4`, t1.`COL 5`) AS FROM_NAME,
+	t2.`COL 80` AS TO_NAME, t1.`COL 81` AS TO_PICTO, 
+	ROUND(REPLACE(t1.`COL 82`, ',', '.'), 1)*1000 AS BRANCH_LENGTH_SLOPE, 
+	ROUND(REPLACE(t1.`COL 83`, ',', '.'), 0) AS BRANCH_MINUTES_TO
+      FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+      WHERE t2.`COL 80` != ''
+      UNION
+      SELECT 
+        t1.`COL 2` AS FROM_IMP_m53_IDX, 
+        CONCAT_WS(', ', t1.`COL 4`, t1.`COL 5`) AS FROM_NAME,
+	t2.`COL 84` AS TO_NAME, t1.`COL 85` AS TO_PICTO, 
+	ROUND(REPLACE(t1.`COL 86`, ',', '.'), 1) AS BRANCH_LENGTH_SLOPE, 
+	ROUND(REPLACE(t1.`COL 87`, ',', '.'), 0) AS BRANCH_MINUTES_TO
+      FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+      WHERE t2.`COL 84` != ''
+      UNION
+      SELECT 
+        t1.`COL 2` AS FROM_IMP_m53_IDX, 
+        CONCAT_WS(', ', t1.`COL 4`, t1.`COL 5`) AS FROM_NAME,
+	t2.`COL 95` AS TO_NAME, t1.`COL 96` AS TO_PICTO, 
+	ROUND(REPLACE(t1.`COL 97`, ',', '.'), 1) AS BRANCH_LENGTH_SLOPE, 
+	ROUND(REPLACE(t1.`COL 98`, ',', '.'), 0) AS BRANCH_MINUTES_TO
+      FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+      WHERE t2.`COL 95` != ''
+      UNION
+      SELECT 
+        t1.`COL 2` AS FROM_IMP_m53_IDX, 
+        CONCAT_WS(', ', t1.`COL 4`, t1.`COL 5`) AS FROM_NAME,
+	t2.`COL 99` AS TO_NAME, t1.`COL 100` AS TO_PICTO, 
+	ROUND(REPLACE(t1.`COL 101`, ',', '.'), 1) AS BRANCH_LENGTH_SLOPE, 
+	ROUND(REPLACE(t1.`COL 102`, ',', '.'), 0) AS BRANCH_MINUTES_TO
+      FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+      WHERE t2.`COL 99` != ''
+	;
+
+# 8. Útvonalpontok-szakaszok (trail_node) beillesztése:
+	SET @rownum := 0;
+	CREATE TABLE tmp_tn AS
+	SELECT 
+		ttr.trail_id,
+		@rownum:=@rownum+1 AS node_idx, tb.branch_id, tn.noi_id, 
+		tn.name, tn.picto,
+		ttr.trailmark as sect_trailmark, ttr.modality as sect_modality,
+		null as sect_length_projection, ROUND(REPLACE(t1.`COL 16`, ',', '.'), 1)*1000 as sect_length_slope, 
+		ROUND(REPLACE(t1.`COL 17`, ',', '.'), 0) as sect_ascent_to, 
+			ROUND(REPLACE(t1.`COL 18`, ',', '.'), 0) as sect_ascent_from, 
+		ROUND(REPLACE(t1.`COL 21`, ',', '.'), 0) as sect_minutes_to, 
+			ROUND(REPLACE(t1.`COL 22`, ',', '.'), 0) as sect_minutes_from,
+		CONCAT(COALESCE(t1.`COL 5`,''), ';IMP_m53_IDX=', t1.`COL 3`, ';') as sect_remark
+	FROM
+		`IMPORT_TRAIL_m53` t1
+		LEFT JOIN trail_branch tb 
+		 ON (tb.branch_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 3`, ';'), tb.branch_remark)>0)
+		LEFT JOIN noi tn 
+		 ON (tn.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 3`, ';'), tn.description)>0)
+		JOIN trail ttr ON (ttr.trail_code = 'm53')  ## a trail_code, ld. fent 5.pontban
+	WHERE t1.`COL 3` != '' AND t1.`COL 3` NOT LIKE '[%';
+	## ORDER BY ... nincs rendezés, a tábla aktuális sorrendje szerint lesz, 
+	## mely a bejövő fájl sorainak felel meg
+
+	## Mj.: Az excelben a node indexével azonosított sorban a node utáni szakasz adatai szerepelnek;
+	## míg az adatbázisban a trail_node sorában az előtte lévő útszakasz adatai szerepelnek a sect_...-ben,
+	## ezért kell az alábbi utasítás:
+	INSERT INTO trail_node 
+		(trail_id, 
+		 node_idx, branch_id, noi_id, 
+		 name, picto, 
+		 sect_trailmark, sect_modality, 
+		 sect_length_projection, sect_length_slope, 
+		 sect_ascent_to, sect_ascent_from, 
+		 sect_minutes_to, sect_minutes_from, 
+		 sect_remark
+		)
+	SELECT
+		 t1.trail_id, 
+		 t1.node_idx, t1.branch_id, t1.noi_id, 
+		 t1.name, t1.picto, 
+		 t2.sect_trailmark, t2.sect_modality, 
+		 t2.sect_length_projection, t2.sect_length_slope, 
+		 t2.sect_ascent_to, t2.sect_ascent_from, 
+		 t2.sect_minutes_to, t2.sect_minutes_from, 
+		 t1.sect_remark
+	FROM tmp_tn t1 LEFT JOIN tmp_tn t2 ON (t1.node_idx - 1 = t2.node_idx);
+
+	DROP TABLE tmp_tn;
+
+# 9. Singpost-ok létrehozása 
+
+#	táblakódok pl.(átírni szükség szerint a lentiekben): 
+#		oszlop: 	EAOP-noi_id/o1
+#		helymegj.: 	EAOP-noi_id/hm1
+#		útirányj.vissz:	EAOP-noi_id/u-trail_code[trailmark]
+#		útirányj.előre:	EAOP-noi_id/u+trail_code[trailmark]
+#		útirányj.kit.v:	EAOP-noi_id/u(k)-trail_code[trailmark]
+#		útirányj.kit.e:	EAOP-noi_id/u(k)+trail_code[trailmark]
+
+#	9a. Minden pontba default oszlop és helymegjelölő tábla létrehozása (ahol nincs)
+		INSERT INTO signpost (signpost_code, noi_id, 
+			signpost_type, material, subtype, 
+			status, `condition`, installed, checked, 
+			maintainer, sponsor, remark)
+		SELECT concat('EAOP-',noi_id,'/o1'), noi_id,
+			'tablaoszlop', null, null, 
+			'IMPORT', null, null, null,
+			'MÚTKE', 'ÉAOP', null
+		FROM noi n
+		WHERE description LIKE '%;IMP_m53_IDX=%' AND NOT EXISTS
+			(SELECT * FROM signpost s WHERE n.noi_id=s.noi_id and s.signpost_type='tablaoszlop');
+
+		INSERT INTO signpost (signpost_code, noi_id, 
+			signpost_type, material, subtype, 
+			content,
+			status, `condition`, installed, checked, 
+			maintainer, sponsor, remark, parent_id)
+		SELECT concat('EAOP-',n.noi_id,'/hm1'), n.noi_id,
+			'helymegjelolo', null, null, 
+			CASE WHEN n.alt IS NULL or n.alt=0
+				THEN n.name
+				ELSE CONCAT(n.name, '\n ', ROUND(n.alt, 0),' m tszf.')
+			END,
+			'IMPORT', null, null, null,
+			'MÚTKE', 'ÉAOP', null, s3.signpost_id
+		FROM noi n, signpost s3
+		WHERE description LIKE '%;IMP_m53_IDX=%' AND NOT EXISTS
+			(SELECT * FROM signpost s WHERE n.noi_id=s.noi_id and s.signpost_type='helymegjelolo')
+		      and s3.signpost_id = (SELECT max(signpost_id) FROM signpost s2 
+				WHERE s2.signpost_type='tablaoszlop' AND s2.noi_id=n.noi_id);
+
+#	9b. Útirányjelző nyilak létrehozása irányonként az oszlopokra, +kitérőkkel
+		##vissza irány:
+		INSERT INTO signpost (signpost_code, noi_id, 
+			signpost_type, direction, angle, material, subtype, 
+			status, `condition`, installed, checked, 
+			maintainer, sponsor, remark, parent_id)
+		SELECT concat('EAOP-',n.noi_id,'/u-',tt.trail_code,'[',tt.trailmark,']'), n.noi_id,
+			'utiranyjelzo', null, null, null, null,
+			'IMPORT', null, null, null,
+			'MÚTKE', 'ÉAOP', concat(';IMP_m53_IDX=',t1.`COL 2`,';'), s3.signpost_id
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail tt ON (tt.trail_code='m53'),  ## a beszurt utvonal
+		  signpost s3
+		WHERE ##(t1.`COL 31` != '' OR t1.`COL 38` != '' OR t1.`COL 45` != '') 
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			(t2.`COL 34` not in ('','-') OR t2.`COL 41` not in ('','-') OR t2.`COL 48` not in ('','-')) 
+		      AND s3.signpost_id = (SELECT max(signpost_id) FROM signpost s2 
+				WHERE s2.signpost_type='tablaoszlop' AND s2.noi_id=n.noi_id);
+
+		##oda irány:
+		INSERT INTO signpost (signpost_code, noi_id, 
+			signpost_type, direction, angle, material, subtype, 
+			status, `condition`, installed, checked, 
+			maintainer, sponsor, remark, parent_id)
+		SELECT concat('EAOP-',n.noi_id,'/u+',tt.trail_code,'[',tt.trailmark,']'), n.noi_id,
+			'utiranyjelzo', null, null, null, null,
+			'IMPORT', null, null, null,
+			'MÚTKE', 'ÉAOP', concat(';IMP_m53_IDX=',t1.`COL 2`,';'), s3.signpost_id
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail tt ON (tt.trail_code='m53'),  ## a beszurt utvonal
+		  signpost s3
+		WHERE ##(t1.`COL 52` != '' OR t1.`COL 59` != '' OR t1.`COL 66` != '') 
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			(t2.`COL 55` != '' OR t2.`COL 62` != '' OR t2.`COL 69` != '') 
+		      AND s3.signpost_id = (SELECT max(signpost_id) FROM signpost s2 
+				WHERE s2.signpost_type='tablaoszlop' AND s2.noi_id=n.noi_id);
+
+		##vissza irány kitérő:
+		INSERT INTO signpost (signpost_code, noi_id, 
+			signpost_type, direction, angle, material, subtype, 
+			status, `condition`, installed, checked, 
+			maintainer, sponsor, remark, parent_id)
+		SELECT concat('EAOP-',n.noi_id,'/u(k)-',tt.trail_code,'[',tt.trailmark,']'), n.noi_id,
+			'utiranyjelzo', null, null, null, null,
+			'IMPORT', null, null, null,
+			'MÚTKE', 'ÉAOP', concat(';IMP_m53_IDX=',t1.`COL 2`,';'), s3.signpost_id
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail tt ON (tt.trail_code='m53'),  ## a beszurt utvonal
+		  signpost s3
+		WHERE ##t1.`COL 73` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 76` not in ('','-')
+		      AND s3.signpost_id = (SELECT max(signpost_id) FROM signpost s2 
+				WHERE s2.signpost_type='tablaoszlop' AND s2.noi_id=n.noi_id);
+
+		##oda irány kitérő:
+		INSERT INTO signpost (signpost_code, noi_id, 
+			signpost_type, direction, angle, material, subtype, 
+			status, `condition`, installed, checked, 
+			maintainer, sponsor, remark, parent_id)
+		SELECT concat('EAOP-',n.noi_id,'/u(k)+',tt.trail_code,'[',tt.trailmark,']'), n.noi_id,
+			'utiranyjelzo', null, null, null, null,
+			'IMPORT', null, null, null,
+			'MÚTKE', 'ÉAOP', concat(';IMP_m53_IDX=',t1.`COL 2`,';'), s3.signpost_id
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail tt ON (tt.trail_code='m53'),  ## a beszurt utvonal
+		  signpost s3
+		WHERE ##t1.`COL 88` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 91` not in ('','-')
+		      AND s3.signpost_id = (SELECT max(signpost_id) FROM signpost s2 
+				WHERE s2.signpost_type='tablaoszlop' AND s2.noi_id=n.noi_id);
+
+#	9c. Táblasorok beszúrása
+		##vissza irány, fejléc
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 trailmark, modality
+				)		
+		SELECT s.signpost_id, 0, 'head',
+			0,
+			tt.trail_id, null, null,
+			concat_ws(' - ', tt.name, tt.name_ext, tt.trail_code), null,
+			tt.trailmark, tt.modality
+		FROM signpost s
+		  JOIN trail_bidir tt ON (tt.trail_id<0 AND tt.trail_code='m53')  ## a beszurt utvonal visszafele
+		WHERE s.signpost_code LIKE CONCAT('EAOP-%/u-',tt.trail_code,'%') AND s.signpost_type = 'utiranyjelzo' AND s.status = 'IMPORT';
+
+		##vissza irány, célsorok:
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 length_slope, minutes_to, 
+				 minutes_rounded, 
+				 trailmark, modality
+				)
+		SELECT s.signpost_id, 1, 'normal',
+			CASE WHEN t2.`COL 34` LIKE '/%' THEN 1 ELSE 0 END,
+			tt.trail_id, tn_from.trail_node_id, tn_to.trail_node_id,
+			t2.`COL 34`, t1.`COL 35`,
+			ROUND(REPLACE(t1.`COL 36`, ',', '.'), 1)*1000, ROUND(REPLACE(t1.`COL 37`, ',', '.'), 0),
+			CASE WHEN t2.`COL 37` NOT IN ('','-') 
+				THEN SUBSTRING_INDEX(t2.`COL 37`,':',1)*60 + SUBSTRING_INDEX(t2.`COL 37`,':',-1) 
+				ELSE NULL 
+			END,
+			tt.trailmark, tt.modality
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail_bidir tt ON (tt.trail_id<0 AND tt.trail_code='m53')  ## a beszurt utvonal visszafele
+		  JOIN signpost s ON (s.signpost_code = concat('EAOP-',n.noi_id,'/u-',tt.trail_code,'[',tt.trailmark,']'))
+		  JOIN trail_node tn_from
+			ON (tn_from.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), tn_from.sect_remark)>0)
+		  JOIN trail_node tn_to
+			ON (tn_to.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 31`, ';'), tn_to.sect_remark)>0)
+		WHERE ##t1.`COL 31` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 34` not in ('','-');
+
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 length_slope, minutes_to, 
+				 minutes_rounded, 
+				 trailmark, modality
+				)
+		SELECT s.signpost_id, 2, 'normal',
+			CASE WHEN t2.`COL 41` LIKE '/%' THEN 1 ELSE 0 END,
+			tt.trail_id, tn_from.trail_node_id, tn_to.trail_node_id,
+			t2.`COL 41`, t1.`COL 42`,
+			ROUND(REPLACE(t1.`COL 43`, ',', '.'), 1)*1000, ROUND(REPLACE(t1.`COL 44`, ',', '.'), 0),
+			CASE WHEN t2.`COL 44` NOT IN ('','-') 
+				THEN SUBSTRING_INDEX(t2.`COL 44`,':',1)*60 + SUBSTRING_INDEX(t2.`COL 44`,':',-1) 
+				ELSE NULL 
+			END,
+			tt.trailmark, tt.modality
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail_bidir tt ON (tt.trail_id<0 AND tt.trail_code='m53')  ## a beszurt utvonal visszafele
+		  JOIN signpost s ON (s.signpost_code = concat('EAOP-',n.noi_id,'/u-',tt.trail_code,'[',tt.trailmark,']'))
+		  JOIN trail_node tn_from
+			ON (tn_from.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), tn_from.sect_remark)>0)
+		  JOIN trail_node tn_to
+			ON (tn_to.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 38`, ';'), tn_to.sect_remark)>0)
+		WHERE ##t1.`COL 38` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 41` not in ('','-');
+
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 length_slope, minutes_to, 
+				 minutes_rounded, 
+				 trailmark, modality
+				)
+		SELECT s.signpost_id, 3, 'normal',
+			CASE WHEN t2.`COL 48` LIKE '/%' THEN 1 ELSE 0 END,
+			tt.trail_id, tn_from.trail_node_id, tn_to.trail_node_id,
+			t2.`COL 48`, t1.`COL 49`,
+			ROUND(REPLACE(t1.`COL 50`, ',', '.'), 1)*1000, ROUND(REPLACE(t1.`COL 51`, ',', '.'), 0),
+			CASE WHEN t2.`COL 51` NOT IN ('','-') 
+				THEN SUBSTRING_INDEX(t2.`COL 51`,':',1)*60 + SUBSTRING_INDEX(t2.`COL 51`,':',-1) 
+				ELSE NULL 
+			END,
+			tt.trailmark, tt.modality
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail_bidir tt ON (tt.trail_id<0 AND tt.trail_code='m53')  ## a beszurt utvonal visszafele
+		  JOIN signpost s ON (s.signpost_code = concat('EAOP-',n.noi_id,'/u-',tt.trail_code,'[',tt.trailmark,']'))
+		  JOIN trail_node tn_from
+			ON (tn_from.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), tn_from.sect_remark)>0)
+		  JOIN trail_node tn_to
+			ON (tn_to.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 45`, ';'), tn_to.sect_remark)>0)
+		WHERE ##t1.`COL 45` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 48` not in ('','-');
+
+		##oda irány, fejléc
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 trailmark, modality
+				)		
+		SELECT s.signpost_id, 0, 'head',
+			0,
+			tt.trail_id, null, null,
+			concat_ws(' - ', tt.name, tt.name_ext, tt.trail_code), null,
+			tt.trailmark, tt.modality
+		FROM signpost s
+		  JOIN trail_bidir tt ON (tt.trail_id>0 AND tt.trail_code='m53')  ## a beszurt utvonal odafele
+		WHERE s.signpost_code LIKE CONCAT('EAOP-%/u+',tt.trail_code,'%') AND s.signpost_type = 'utiranyjelzo' AND s.status = 'IMPORT';
+
+		## oda irány, célsorok:
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 length_slope, minutes_to, 
+				 minutes_rounded, 
+				 trailmark, modality
+				)
+		SELECT s.signpost_id, 1, 'normal',
+			CASE WHEN t2.`COL 55` LIKE '/%' THEN 1 ELSE 0 END,
+			tt.trail_id, tn_from.trail_node_id, tn_to.trail_node_id,
+			t2.`COL 55`, t1.`COL 56`,
+			ROUND(REPLACE(t1.`COL 57`, ',', '.'), 1)*1000, ROUND(REPLACE(t1.`COL 58`, ',', '.'), 0),
+			CASE WHEN t2.`COL 58` NOT IN ('','-') 
+				THEN SUBSTRING_INDEX(t2.`COL 58`,':',1)*60 + SUBSTRING_INDEX(t2.`COL 58`,':',-1) 
+				ELSE NULL 
+			END,
+			tt.trailmark, tt.modality
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail_bidir tt ON (tt.trail_id>0 AND tt.trail_code='m53')  ## a beszurt utvonal odafele
+		  JOIN signpost s ON (s.signpost_code = concat('EAOP-',n.noi_id,'/u+',tt.trail_code,'[',tt.trailmark,']'))
+		  JOIN trail_node tn_from
+			ON (tn_from.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), tn_from.sect_remark)>0)
+		  JOIN trail_node tn_to
+			ON (tn_to.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 52`, ';'), tn_to.sect_remark)>0)
+		WHERE ##t1.`COL 52` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 55` not in ('','-');
+
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 length_slope, minutes_to, 
+				 minutes_rounded, 
+				 trailmark, modality
+				)
+		SELECT s.signpost_id, 2, 'normal',
+			CASE WHEN t2.`COL 62` LIKE '/%' THEN 1 ELSE 0 END,
+			tt.trail_id, tn_from.trail_node_id, tn_to.trail_node_id,
+			t2.`COL 62`, t1.`COL 63`,
+			ROUND(REPLACE(t1.`COL 64`, ',', '.'), 1)*1000, ROUND(REPLACE(t1.`COL 65`, ',', '.'), 0),
+			CASE WHEN t2.`COL 65` NOT IN ('','-') 
+				THEN SUBSTRING_INDEX(t2.`COL 65`,':',1)*60 + SUBSTRING_INDEX(t2.`COL 65`,':',-1) 
+				ELSE NULL 
+			END,
+			tt.trailmark, tt.modality
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail_bidir tt ON (tt.trail_id>0 AND tt.trail_code='m53')  ## a beszurt utvonal odafele
+		  JOIN signpost s ON (s.signpost_code = concat('EAOP-',n.noi_id,'/u+',tt.trail_code,'[',tt.trailmark,']'))
+		  JOIN trail_node tn_from
+			ON (tn_from.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), tn_from.sect_remark)>0)
+		  JOIN trail_node tn_to
+			ON (tn_to.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 59`, ';'), tn_to.sect_remark)>0)
+		WHERE ##t1.`COL 59` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 62` not in ('','-');
+
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 length_slope, minutes_to, 
+				 minutes_rounded, 
+				 trailmark, modality
+				)
+		SELECT s.signpost_id, 3, 'normal',
+			CASE WHEN t2.`COL 69` LIKE '/%' THEN 1 ELSE 0 END,
+			tt.trail_id, tn_from.trail_node_id, tn_to.trail_node_id,
+			t2.`COL 69`, t1.`COL 70`,
+			ROUND(REPLACE(t1.`COL 71`, ',', '.'), 1)*1000, ROUND(REPLACE(t1.`COL 72`, ',', '.'), 0),
+			CASE WHEN t2.`COL 72` NOT IN ('','-') 
+				THEN SUBSTRING_INDEX(t2.`COL 72`,':',1)*60 + SUBSTRING_INDEX(t2.`COL 72`,':',-1) 
+				ELSE NULL 
+			END,
+			tt.trailmark, tt.modality
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail_bidir tt ON (tt.trail_id>0 AND tt.trail_code='m53')  ## a beszurt utvonal odafele
+		  JOIN signpost s ON (s.signpost_code = concat('EAOP-',n.noi_id,'/u+',tt.trail_code,'[',tt.trailmark,']'))
+		  JOIN trail_node tn_from
+			ON (tn_from.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), tn_from.sect_remark)>0)
+		  JOIN trail_node tn_to
+			ON (tn_to.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 66`, ';'), tn_to.sect_remark)>0)
+		WHERE ##t1.`COL 66` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 69` not in ('','-');
+
+		## kitérő célsor vissza irány:
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 length_slope, minutes_to, 
+				 minutes_rounded, 
+				 trailmark, modality
+				)
+		SELECT s.signpost_id, 1, 'normal',
+			CASE WHEN t2.`COL 76` LIKE '/%' THEN 1 ELSE 0 END,
+			tt.trail_id, tn_from.trail_node_id, tn_to.trail_node_id,
+			t2.`COL 76`, t1.`COL 77`,
+			ROUND(REPLACE(t1.`COL 78`, ',', '.'), 1)*1000, ROUND(REPLACE(t1.`COL 79`, ',', '.'), 0),
+			CASE WHEN t2.`COL 79` NOT IN ('','-') 
+				THEN SUBSTRING_INDEX(t2.`COL 79`,':',1)*60 + SUBSTRING_INDEX(t2.`COL 79`,':',-1) 
+				ELSE NULL 
+			END,
+			t2.`COL 73`, tt.modality
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail_bidir tt ON (tt.trail_id<0 AND tt.trail_code='m53')  ## a beszurt utvonal visszafele
+		  JOIN signpost s ON (s.signpost_code = concat('EAOP-',n.noi_id,'/u(k)-',tt.trail_code,'[',tt.trailmark,']'))
+		  JOIN trail_node tn_from
+			ON (tn_from.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), tn_from.sect_remark)>0)
+		  JOIN trail_node tn_to
+			ON (tn_to.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 73`, ';'), tn_to.sect_remark)>0)
+		WHERE ##t1.`COL 73` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 76` not in ('','-');
+
+		## kitérő célsor oda irány:
+		INSERT INTO signpost_row (
+				 signpost_id, row_idx, row_type, 
+				 has_branchline, 
+				 trail_id, from_node_id, to_node_id, 
+				 content_text, picto, 
+				 length_slope, minutes_to, 
+				 minutes_rounded, 
+				 trailmark, modality
+				)
+		SELECT s.signpost_id, 1, 'normal',
+			CASE WHEN t2.`COL 91` LIKE '/%' THEN 1 ELSE 0 END,
+			tt.trail_id, tn_from.trail_node_id, tn_to.trail_node_id,
+			t2.`COL 91`, t1.`COL 92`,
+			ROUND(REPLACE(t1.`COL 93`, ',', '.'), 1)*1000, ROUND(REPLACE(t1.`COL 94`, ',', '.'), 0),
+			CASE WHEN t2.`COL 94` NOT IN ('','-') 
+				THEN SUBSTRING_INDEX(t2.`COL 94`,':',1)*60 + SUBSTRING_INDEX(t2.`COL 94`,':',-1) 
+				ELSE NULL 
+			END,
+			t2.`COL 88`, tt.modality
+		FROM `IMPORT_TRAIL_m53` t1 JOIN `IMPORT_TRAIL_m53` t2 ON (t1.`COL 2` != '' AND t1.`COL 2` = t2.`COL 3`)
+		  JOIN noi n 
+		    ON (n.description != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), n.description)>0)
+		  JOIN trail_bidir tt ON (tt.trail_id>0 AND tt.trail_code='m53')  ## a beszurt utvonal odafele
+		  JOIN signpost s ON (s.signpost_code = concat('EAOP-',n.noi_id,'/u(k)+',tt.trail_code,'[',tt.trailmark,']'))
+		  JOIN trail_node tn_from
+			ON (tn_from.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 2`, ';'), tn_from.sect_remark)>0)
+		  JOIN trail_node tn_to
+			ON (tn_to.sect_remark != '' AND LOCATE(CONCAT(';IMP_m53_IDX=', t1.`COL 88`, ';'), tn_to.sect_remark)>0)
+		WHERE ##t1.`COL 88` != ''
+				## a fenti idx alapján lenne, ha nem volt kiirando_celpontok lap az excelben
+			t2.`COL 91` not in ('','-');
+
+#	(+extra kitérők [IMPORT_EXTRA_BRANCH_... tábla] egyénileg szerkesztendők, ld. lejjebbb!)
+
+# 10. Útjelző tereptárgyak (betonoszlopok) létrehozása
+#	... !!! (ld külön leírásban: excel_import_utjelzo_tereptargy_howto.txt
+
+#########
+
+...kézi utómunkák:
+ a. trail_branch táblában kitölteni: 
+	  i. ha útvonalra hivatkozik (branch_trail_id, branch_from_node_id, branch_to_node_id), 
+	 ii. a geometriát (branch_segments/_rev, branch_points/_rev), +esetleg mást is,
+	iii. rendbe rakni a trailmark-ot ([] törlése, esetleg ami nem odavaló átrakni,
+	 iv. törölni a branch_remark-ból az ';IMP_m53_IDX=...' -et:
+		UPDATE trail_branch SET branch_remark=
+			SUBSTRING(branch_remark, 1, LOCATE(';IMP_m53_IDX=', branch_remark) - 1)
+		  WHERE branch_remark LIKE '%;IMP_m53_IDX=%'; 
+
+	(a trail_branch táblában nincs group, hanem egy branch mindazon group-okba tartozik, 
+	 amelyek hivatkozzák az útvonalakból, azaz a 
+	 trail_node JOIN trail_section [trail_section_expanded] táblából)
+ b. extra kitérők feldolgozása az IMPORT_EXTRA_BRANCH_...-ból
+	  i. Az extra kitérőkből lehet új branch-eket létrehozni, vagy lehet hogy a nekik
+	     megfelelő útvonalak már külön léteznek. 
+		(nem kötelező, signpost-ok enélkül is létrehozhatók, 
+		 de akkor azok "kézi gyártmányok" lesznek, logikailag nem kötődnek az úthálózathoz)
+	 ii. Az extra kitérőknek megfelelő signpost-ok, signpost_row-k létrehozása 
+		(ill. összevetése, ha már más útvonalként létezett az extra kitérő és táblázva volt).
+	iii. DROP TABLE IMPORT_EXTRA_BRANCH_...;
+ c. noi-k elrendezése:
+      i. azonos noi-k (de kül. néven szereplők) összevonása: noi rekordok adatainak egyesítése és 
+	 az id-k átírása a signpost, trail_node, noi(parent) táblákban.
+     ii. a "dummy noi"-k ('…%'-osak) kifűzése az útvonalból, vagy elnevezése értelmesen,
+    iii. noi-k neveinek elrendezése (pl. 'Nagykároly / Carei' esetén Carei átírása a name2-be),
+     iv. IMPORT_NOI_m53 tábla törlése:
+	   DROP TABLE IMPORT_NOI_m53;
+      v. noi táblából a description végéről leszedni az ';IMP_m53_IDX=' részt:
+	  UPDATE noi 
+	  SET description = SUBSTRING(description, 1, LOCATE(';IMP_m53_IDX=', description) - 1)
+	  WHERE description LIKE '%;IMP_m53_IDX=%'; 
+ d. szükség szerint az útvonal (trail) összevonása, beillesztése meglévő útvonallal/ba.
+ e. szükség szerint szakaszok (trail_section) létrehozása az útvonalban 
+	(kezelő szervezet, régió, tuhu_route, napi_etap, jogosultságok(group), stb...)
+ f. trail_node-ban: 
+	  i. priority, priority_rev kitöltése szükség szerint, 
+	 ii. a geometriát (sect_segments/_rev, sect_points/_rev), +esetleg mást is,
+	iii. törölni a sect_remark-ból az 'IMP_m53_IDX=...' -et:
+		UPDATE trail_node SET remark=SUBSTRING(remark, 1, LOCATE(';IMP_m53_IDX=', remark) - 1)
+		  WHERE remark LIKE '%;IMP_m53_IDX=%'; 
+	(a trail_node táblában nincs group, hanem a trail_section [trail_section_expanded] definiálja)
+
+ g. signpost-ok és soraik (signpost_row) kézi finomítása:
+	... !!! status='IMPORT', ezek feldolgozása szükséges
+	material, status, direction, angle, subtype, condition, installed, checked, maintainer, sponsor kitöltése
+	helymegjelölő táblák törlése ahol info tábla van/lesz ill. ahol nem szükséges
+	táblasorok: '/' jelek törlése az elejéről, piktogramok és útjelzések rendbe tétele  (pl. kitérőknél most null a jelzés)
+     +ha már vannak legenerált/legyártott táblák, akkor azok alapján való frissítés
+
+ h. az import tábla (a példában `IMPORT_TRAIL_m53`) törlése: DROP TABLE `IMPORT_TRAIL_m53`;
+

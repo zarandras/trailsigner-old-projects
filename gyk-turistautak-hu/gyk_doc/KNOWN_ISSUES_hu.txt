@@ -1,0 +1,30 @@
+
+GyalogútKataszter v0.1
+
+Ismert továbbfejlesztési lehetőségek:
+-------------------------------------
+
+Viewer (böngésző):
+	táblázási struktúra megjelenítése (táblakiírások összegző táblázata útvonalanként)
+
+Adatok: 
+	koordináták (helyek), itinerek (nyomvonalak) bővítése a mintautakon túl
+	útjelző elemek bővítése az útirányjelzőkön túl, adatok frissítése
+
+UI:
+	memória túlcsordulás hiba javítása (pl. táblasor szerkesztésnél, ha ilyen előfordul, Shift+Reload segít)
+	leágazás (branch) szerkesztés továbbfejlesztése
+	tetszőleges útszakaszra tól-ig adatok lekérdezése (összegzés)
+	további UI fejlesztés a könnyebb kezelhetőség érdekében
+	piktogramok bevezetése a megjelenítésbe (pl. szállás, vasút, település, templom stb.)
+
+Általános továbbfejl. irányok:
+	jelen formában egy adatbázis egy közös jelszóval szerkeszthető, 
+	  csoportok szükségesek több térség/projekt külön kezelésére
+	később több adatnál jobban skálázódó megoldás (view-k kiváltása?)
+	adatok default értékének számítása, aut.kitöltése
+		(pl. név a táblára, helyhez; koordináták; km-ó-p stb.)
+	térinformatikai vonatkozások, kapcsolatok
+	 (pl. tuhu útv.terv., omp térképkapcs., mariaut.hu portál kapcs.,
+		téradatok export/import)
+

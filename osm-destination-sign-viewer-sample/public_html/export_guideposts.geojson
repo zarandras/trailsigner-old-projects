@@ -1,0 +1,519 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-ide",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2019-08-17T11:40:02Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2111045389",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "22A",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4582124,
+          46.718035
+        ]
+      },
+      "id": "node/2111045389"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2922105662",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "22;22A",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4379882,
+          46.7233479
+        ]
+      },
+      "id": "node/2922105662"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906146967",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "T;7A",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4294387,
+          46.6823079
+        ]
+      },
+      "id": "node/3906146967"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906146969",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "T;7",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4257987,
+          46.6853444
+        ]
+      },
+      "id": "node/3906146969"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906146970",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "T",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4251847,
+          46.685833
+        ]
+      },
+      "id": "node/3906146970"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804365",
+        "information": "guidepost",
+        "name": "Echo Quelle",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4759368,
+          46.7175122
+        ]
+      },
+      "id": "node/3906804365"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804367",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "7;7A",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4572303,
+          46.6840973
+        ]
+      },
+      "id": "node/3906804367"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804368",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "7;9",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4362073,
+          46.6853374
+        ]
+      },
+      "id": "node/3906804368"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804369",
+        "hiking": "yes",
+        "information": "guidepost",
+        "mapillary": "QcITCnmjcZW5VHWbZbwRQw",
+        "operator": "AVS",
+        "ref": "7;8",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4292982,
+          46.6861269
+        ]
+      },
+      "id": "node/3906804369"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804370",
+        "hiking": "yes",
+        "information": "guidepost",
+        "mapillary": "c_dA-0JyvQnroM5H14nnaQ",
+        "operator": "AVS",
+        "ref": "7",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4261757,
+          46.686173
+        ]
+      },
+      "id": "node/3906804370"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804381",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "7;7A",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4733463,
+          46.6924762
+        ]
+      },
+      "id": "node/3906804381"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804382",
+        "hiking": "yes",
+        "information": "guidepost",
+        "mapillary": "_bj5NPP6-EAlC3DqbgNnEg",
+        "operator": "AVS",
+        "ref": "7;7-8A;7-8B;7B;11",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4739843,
+          46.69322
+        ]
+      },
+      "id": "node/3906804382"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804383",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "7;7B",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4750812,
+          46.694117
+        ]
+      },
+      "id": "node/3906804383"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804384",
+        "hiking": "yes",
+        "information": "guidepost",
+        "mapillary": "-MWPMd9ZqzEItwwwTyXTgQ",
+        "operator": "AVS",
+        "ref": "1;7;17",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4991932,
+          46.7016337
+        ]
+      },
+      "id": "node/3906804384"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804386",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "7;7-8B;8A",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4822199,
+          46.7034846
+        ]
+      },
+      "id": "node/3906804386"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804387",
+        "hiking": "yes",
+        "information": "guidepost",
+        "mapillary": "HV_fRoVgMDk3PfjJtXbyQw",
+        "operator": "AVS",
+        "ref": "7;8C",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4889473,
+          46.7041323
+        ]
+      },
+      "id": "node/3906804387"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804388",
+        "hiking": "yes",
+        "information": "guidepost",
+        "mapillary": "sPkXcNOGgZB50VVenpp6pA",
+        "operator": "AVS",
+        "ref": "7;7C;8B",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4862108,
+          46.7052306
+        ]
+      },
+      "id": "node/3906804388"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804389",
+        "hiking": "yes",
+        "information": "guidepost",
+        "mapillary": "oN88v0S1-dqWdgKf-LorRQ",
+        "operator": "AVS",
+        "ref": "8;9",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4942659,
+          46.7083175
+        ]
+      },
+      "id": "node/3906804389"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804390",
+        "hiking": "yes",
+        "information": "guidepost",
+        "mapillary": "L8DWAtE_GEvS8Dzcer-TdQ",
+        "operator": "AVS",
+        "ref": "8;8B",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4919576,
+          46.7094461
+        ]
+      },
+      "id": "node/3906804390"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804391",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "8;8-8B;22A",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4876432,
+          46.7126697
+        ]
+      },
+      "id": "node/3906804391"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804404",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "22;22A",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4358324,
+          46.7252115
+        ]
+      },
+      "id": "node/3906804404"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804407",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "22",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.437754,
+          46.7312227
+        ]
+      },
+      "id": "node/3906804407"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3906804408",
+        "hiking": "yes",
+        "information": "guidepost",
+        "operator": "AVS",
+        "ref": "22",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4382854,
+          46.7322396
+        ]
+      },
+      "id": "node/3906804408"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4358923449",
+        "information": "guidepost",
+        "mapillary": "Kdck6uY8t6ugT4MOA2ibdA",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4439208,
+          46.6940849
+        ]
+      },
+      "id": "node/4358923449"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4358923671",
+        "information": "guidepost",
+        "mapillary": "9MCMnAI4BM40xWwDPDEzPg",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4999472,
+          46.7015923
+        ]
+      },
+      "id": "node/4358923671"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4358923735",
+        "information": "guidepost",
+        "mapillary": "SZTvits_9tdvlTtAjK2dLg",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.497655,
+          46.702505
+        ]
+      },
+      "id": "node/4358923735"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4358923890",
+        "information": "guidepost",
+        "mapillary": "wbla14XjFiMr6iKH2rtDMg",
+        "tourism": "information"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4892575,
+          46.7077506
+        ]
+      },
+      "id": "node/4358923890"
+    }
+  ]
+}

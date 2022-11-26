@@ -1,0 +1,483 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="Overpass API 0.7.55.7 8b86ff77">
+<note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
+<meta osm_base="2019-08-17T11:53:02Z"/>
+
+  <relation id="5804902">
+    <member type="way" ref="205356478" role="to"/>
+    <member type="node" ref="476867306" role="intersection"/>
+    <member type="node" ref="3906804384" role="sign"/>
+    <tag k="destination" v="Gasteiger Sattel;Rittner Horn;Kasereck"/>
+    <tag k="ref" v="1"/>
+    <tag k="time" v="2:30;3:30;1:10"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804903">
+    <member type="node" ref="3906804384" role="sign"/>
+    <member type="node" ref="476867306" role="intersection"/>
+    <member type="way" ref="432412674" role="to"/>
+    <member type="way" ref="205356423" role="to"/>
+    <tag k="destination" v="Klausner Hütte;Klausen;Kühhof"/>
+    <tag k="ref" v="1"/>
+    <tag k="time" v="0:50;14:10;1:40"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804915">
+    <member type="node" ref="3906804382" role="sign"/>
+    <member type="node" ref="309386894" role="intersection"/>
+    <member type="way" ref="438151085" role="to"/>
+    <tag k="destination" v="Kabinenbahn"/>
+    <tag k="ref" v="11"/>
+    <tag k="time" v="1:00"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804953">
+    <member type="node" ref="3906804403" role="intersection"/>
+    <member type="node" ref="3906804404" role="sign"/>
+    <tag k="destination" v="Durnholz"/>
+    <tag k="ref" v="22"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804954">
+    <member type="node" ref="3906804408" role="sign"/>
+    <member type="node" ref="1634918877" role="intersection"/>
+    <member type="way" ref="388232119" role="to"/>
+    <tag k="destination" v="Durnholz"/>
+    <tag k="ref" v="22"/>
+    <tag k="time" v="0:20"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804955">
+    <member type="node" ref="3906804408" role="sign"/>
+    <member type="node" ref="1634918877" role="intersection"/>
+    <member type="way" ref="388232115" role="to"/>
+    <tag k="destination" v="Reinswald;Kassian Spitze;Latzfonser Kreuz;Pfattner Albl;Pfatten Spitz"/>
+    <tag k="ref" v="22"/>
+    <tag k="time" v="2:00"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804956">
+    <member type="node" ref="1448496663" role="intersection"/>
+    <member type="way" ref="388232115" role="to"/>
+    <member type="node" ref="3906804407" role="sign"/>
+    <tag k="destination" v="Durnholz"/>
+    <tag k="ref" v="22"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804957">
+    <member type="node" ref="2922105663" role="intersection"/>
+    <member type="node" ref="2922105662" role="sign"/>
+    <member type="way" ref="288658174" role="to"/>
+    <tag k="destination" v="Durnholz"/>
+    <tag k="ref" v="22"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804958">
+    <member type="node" ref="3906804407" role="sign"/>
+    <member type="node" ref="1448496663" role="intersection"/>
+    <tag k="destination" v="Reinswald;Kassian Spitze;Latzfonser Kreuz;Pfattner Albl;Pfatten Spitz"/>
+    <tag k="ref" v="22"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804959">
+    <member type="node" ref="3906804404" role="sign"/>
+    <member type="node" ref="3906804403" role="intersection"/>
+    <tag k="destination" v="Reinswald"/>
+    <tag k="ref" v="22"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804961">
+    <member type="node" ref="2922142452" role="intersection"/>
+    <member type="node" ref="3906804391" role="sign"/>
+    <member type="way" ref="288661684" role="to"/>
+    <tag k="destination" v="Pfattner Albl;Durnholz;Reinswald;zum Weg 22"/>
+    <tag k="ref" v="22A"/>
+    <tag k="time" v="1:00;2:10;?;?"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804962">
+    <member type="node" ref="3906804404" role="sign"/>
+    <member type="node" ref="3906804403" role="intersection"/>
+    <member type="way" ref="387379320" role="to"/>
+    <tag k="destination" v="Kassianspitz;Latzfonser Kreuz;Pfattner Albl;Pfatten Spitz"/>
+    <tag k="ref" v="22A"/>
+    <tag k="time" v="2:45;2:50;1:00;1:50"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804963">
+    <member type="node" ref="2111045389" role="sign"/>
+    <member type="node" ref="2922123822" role="intersection"/>
+    <member type="way" ref="288659926" role="to"/>
+    <tag k="destination" v="Durnholz"/>
+    <tag k="ref" v="22A"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804964">
+    <member type="node" ref="2111045389" role="sign"/>
+    <member type="node" ref="2922123822" role="intersection"/>
+    <member type="way" ref="288659924" role="to"/>
+    <tag k="destination" v="Kassianspitz;Latzfonser Kreuz"/>
+    <tag k="ref" v="22A"/>
+    <tag k="time" v="1:45;2:00"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5804965">
+    <member type="node" ref="2922105663" role="intersection"/>
+    <member type="node" ref="2922105662" role="sign"/>
+    <member type="way" ref="201151880" role="to"/>
+    <tag k="destination" v="Kassianspitz;Latzfonser Kreuz;Pfattner Albl;Pfatten Spitz"/>
+    <tag k="ref" v="22A"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805037">
+    <member type="node" ref="309389160" role="intersection"/>
+    <member type="node" ref="3906804388" role="sign"/>
+    <member type="way" ref="388232010" role="to"/>
+    <tag k="destination" v="Latzfonser Kreuz"/>
+    <tag k="ref" v="7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805038">
+    <member type="node" ref="513756030" role="intersection"/>
+    <member type="node" ref="3906804369" role="sign"/>
+    <member type="way" ref="75513843" role="to"/>
+    <tag k="destination" v="Reinswald"/>
+    <tag k="ref" v="7"/>
+    <tag k="time" v="0:20"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805039">
+    <member type="way" ref="74330474" role="to"/>
+    <member type="node" ref="309386705" role="intersection"/>
+    <member type="node" ref="3906804368" role="sign"/>
+    <tag k="destination" v="Latzfonser Kreuz;Getrum Alm"/>
+    <tag k="ref" v="7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805040">
+    <member type="node" ref="309389170" role="intersection"/>
+    <member type="way" ref="388232010" role="to"/>
+    <member type="node" ref="3906804387" role="sign"/>
+    <tag k="destination" v="Gedrum Alm;Reinswald"/>
+    <tag k="ref" v="7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805041">
+    <member type="node" ref="513756030" role="intersection"/>
+    <member type="node" ref="3906804369" role="sign"/>
+    <member type="way" ref="388232012" role="to"/>
+    <tag k="destination" v="Gedrum Alm;Latzfonser KReuz"/>
+    <tag k="ref" v="7"/>
+    <tag k="time" v="1:20;2:20"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805042">
+    <member type="way" ref="388232100" role="to"/>
+    <member type="node" ref="309386894" role="intersection"/>
+    <member type="node" ref="3906804382" role="sign"/>
+    <tag k="destination" v="Reinswald"/>
+    <tag k="ref" v="7"/>
+    <tag k="time" v="1:45"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805043">
+    <member type="node" ref="309389170" role="intersection"/>
+    <member type="node" ref="3906804387" role="sign"/>
+    <member type="way" ref="131552277" role="to"/>
+    <tag k="destination" v="Latzfonser Kreuz"/>
+    <tag k="ref" v="7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805044">
+    <member type="node" ref="309386705" role="intersection"/>
+    <member type="node" ref="3906804368" role="sign"/>
+    <member type="way" ref="438151077" role="to"/>
+    <tag k="destination" v="Reinswald"/>
+    <tag k="ref" v="7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805045">
+    <member type="node" ref="309389115" role="intersection"/>
+    <member type="node" ref="3906804383" role="sign"/>
+    <member type="way" ref="131550894" role="to"/>
+    <tag k="destination" v="Reinswald"/>
+    <tag k="ref" v="7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805046">
+    <member type="node" ref="309386890" role="intersection"/>
+    <member type="way" ref="75649319" role="to"/>
+    <member type="node" ref="3906804381" role="sign"/>
+    <tag k="destination" v="Reinswald"/>
+    <tag k="ref" v="7"/>
+    <tag k="time" v="1:45"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805048">
+    <member type="node" ref="309386789" role="intersection"/>
+    <member type="way" ref="388232079" role="to"/>
+    <member type="node" ref="3906804367" role="sign"/>
+    <tag k="destination" v="Latzfonser KReuz;Getrum Alm"/>
+    <tag k="ref" v="7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805049">
+    <member type="node" ref="309389160" role="intersection"/>
+    <member type="way" ref="388232011" role="to"/>
+    <member type="node" ref="3906804388" role="sign"/>
+    <tag k="destination" v="Gedrum Alm;Reinswald"/>
+    <tag k="ref" v="7"/>
+    <tag k="time" v="0:30;?"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805050">
+    <member type="node" ref="309389115" role="intersection"/>
+    <member type="way" ref="131552276" role="to"/>
+    <member type="node" ref="3906804383" role="sign"/>
+    <tag k="destination" v="Latzfonser Kreuz"/>
+    <tag k="ref" v="7"/>
+    <tag k="time" v="1:15"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805051">
+    <member type="node" ref="309386789" role="intersection"/>
+    <member type="node" ref="3906804367" role="sign"/>
+    <member type="way" ref="74330474" role="to"/>
+    <tag k="destination" v="Reinswald"/>
+    <tag k="ref" v="7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805052">
+    <member type="node" ref="3914477749" role="intersection"/>
+    <member type="node" ref="3906804386" role="sign"/>
+    <member type="way" ref="438151002" role="to"/>
+    <tag k="destination" v="Gedrum Alm:Reinswald"/>
+    <tag k="ref" v="7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805054">
+    <member type="node" ref="3906804382" role="sign"/>
+    <member type="node" ref="309386894" role="intersection"/>
+    <member type="way" ref="131550894" role="to"/>
+    <tag k="destination" v="Kassianspitz;Latzfonser Kreuz;Getrum See;Plankenhorn;Stöffelhütte"/>
+    <tag k="ref" v="7-8B;7;7-8A;7-8A;7B"/>
+    <tag k="time" v="1:15;1:15;0:50;1:30;1:40"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805055">
+    <member type="way" ref="387379321" role="to"/>
+    <member type="node" ref="3906804379" role="intersection"/>
+    <member type="node" ref="3906804380" role="sign"/>
+    <tag k="destination" v="Pichlberg;Plankenhorn;Getrum Alm;Latzfonser Kreuz;Sunnolm;Stofflhütte"/>
+    <tag k="ref" v="7:7:7:7:7:7"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805056">
+    <member type="node" ref="476867306" role="intersection"/>
+    <member type="node" ref="3906804384" role="sign"/>
+    <member type="way" ref="388232020" role="to"/>
+    <tag k="destination" v="Getrum Alm;Reinswald;Kassianspitze"/>
+    <tag k="ref" v="7;17"/>
+    <tag k="time" v="0:50;2:10;?"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805057">
+    <member type="node" ref="3914477749" role="intersection"/>
+    <member type="node" ref="3906804386" role="sign"/>
+    <member type="way" ref="438151001" role="to"/>
+    <tag k="destination" v="Latzfonser Kreuz;Kassianspitz"/>
+    <tag k="ref" v="7;7-8B"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805061">
+    <member type="node" ref="3906804381" role="sign"/>
+    <member type="node" ref="309386890" role="intersection"/>
+    <member type="way" ref="388232055" role="to"/>
+    <tag k="destination" v="Mühlenweg nach Reinswald"/>
+    <tag k="ref" v="7A"/>
+    <tag k="time" v="2:00"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805063">
+    <member type="node" ref="309386789" role="intersection"/>
+    <member type="way" ref="126514392" role="to"/>
+    <member type="way" ref="636617187" role="to"/>
+    <member type="node" ref="3906804367" role="sign"/>
+    <tag k="destination" v="Stöffl Hütte;Reinswald"/>
+    <tag k="ref" v="7A"/>
+    <tag k="time" v="?;1:15"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805065">
+    <member type="node" ref="890880921" role="intersection"/>
+    <member type="node" ref="3906146967" role="sign"/>
+    <member type="way" ref="75460718" role="to"/>
+    <tag k="destination" v="Waldrast;Astfeld;Sarnthein;Unterreinswald"/>
+    <tag k="ref" v="7A;7A;7A;7A"/>
+    <tag k="time" v="2:10;2:30;2:15;?"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805067">
+    <member type="node" ref="309389115" role="intersection"/>
+    <member type="way" ref="201149479" role="to"/>
+    <member type="node" ref="3906804383" role="sign"/>
+    <tag k="destination" v="Stöffel Hütte"/>
+    <tag k="ref" v="7B"/>
+    <tag k="time" v="1:40"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805068">
+    <member type="node" ref="3907684811" role="intersection"/>
+    <member type="node" ref="3906804388" role="sign"/>
+    <tag k="destination" v="Getrum See;Plankenhorn"/>
+    <tag k="ref" v="7C"/>
+    <tag k="time" v="0:20;1:00"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805069">
+    <member type="node" ref="1447489787" role="intersection"/>
+    <member type="way" ref="288661680" role="to"/>
+    <member type="node" ref="3906804390" role="sign"/>
+    <tag k="destination" v="Getrum Joch;Plankenhorn;Pfattner Albl;Durnholz"/>
+    <tag k="ref" v="8"/>
+    <tag k="time" v="0:30;1:00;1:15;2:20"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805071">
+    <member type="way" ref="131550890" role="to"/>
+    <member type="node" ref="2922142452" role="intersection"/>
+    <member type="node" ref="3906804391" role="sign"/>
+    <tag k="destination" v="Getrum Joch;Plankenhorn;Getrum-Kammweg"/>
+    <tag k="ref" v="8"/>
+    <tag k="time" v="0:20;0:50;?"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805072">
+    <member type="way" ref="131552273" role="to"/>
+    <member type="node" ref="1447489787" role="intersection"/>
+    <member type="node" ref="3906804390" role="sign"/>
+    <tag k="destination" v="Kassianspitz"/>
+    <tag k="ref" v="8"/>
+    <tag k="time" v="0:20"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805073">
+    <member type="node" ref="3906804369" role="sign"/>
+    <member type="node" ref="513756030" role="intersection"/>
+    <member type="way" ref="388232103" role="to"/>
+    <tag k="destination" v="Pichlberg;Plankenhorn;Sunnolm"/>
+    <tag k="ref" v="8"/>
+    <tag k="time" v="1:00;3:00;?"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805074">
+    <member type="node" ref="252412732" role="intersection"/>
+    <member type="node" ref="3906804389" role="sign"/>
+    <member type="way" ref="131552273" role="to"/>
+    <tag k="destination" v="Getrumjoch;Plankenhorn;Getrumalm;Reinswald"/>
+    <tag k="ref" v="8"/>
+    <tag k="time" v="0:50;1:20;1:00;?"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805075">
+    <member type="way" ref="288661680" role="to"/>
+    <member type="node" ref="2922142452" role="intersection"/>
+    <member type="node" ref="3906804391" role="sign"/>
+    <tag k="destination" v="Kassianspitz;Latzfonser Kreuz;Gedrum Alm;Reinswald"/>
+    <tag k="ref" v="8-8B"/>
+    <tag k="time" v="0:35;?;?;?"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805080">
+    <member type="node" ref="3914477749" role="intersection"/>
+    <member type="way" ref="388232013" role="to"/>
+    <member type="node" ref="3906804386" role="sign"/>
+    <tag k="destination" v="Getrum See;Plankenhorn"/>
+    <tag k="ref" v="8A;8A"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805082">
+    <member type="node" ref="513800740" role="intersection"/>
+    <member type="node" ref="3906804388" role="sign"/>
+    <member type="way" ref="41731894" role="to"/>
+    <tag k="destination" v="Kassianspitz"/>
+    <tag k="ref" v="8B"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805084">
+    <member type="node" ref="3906804390" role="sign"/>
+    <member type="node" ref="1447489787" role="intersection"/>
+    <member type="way" ref="131552275" role="to"/>
+    <tag k="destination" v="Getrum Alm;Reinswald;Latzfonser Kreuz"/>
+    <tag k="ref" v="8B"/>
+    <tag k="time" v="?;?;0:30"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805085">
+    <member type="node" ref="309389170" role="intersection"/>
+    <member type="node" ref="3906804387" role="sign"/>
+    <member type="way" ref="131552274" role="to"/>
+    <tag k="destination" v="Pfattner Alm;Durnholz"/>
+    <tag k="ref" v="8C"/>
+    <tag k="time" v="1:30;2:40"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805087">
+    <member type="node" ref="3906804389" role="sign"/>
+    <member type="node" ref="252412732" role="intersection"/>
+    <member type="way" ref="288661682" role="to"/>
+    <tag k="destination" v="Latzfonser Kreuz"/>
+    <tag k="ref" v="9"/>
+    <tag k="time" v="0:40"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805088">
+    <member type="node" ref="309386705" role="intersection"/>
+    <member type="node" ref="3906804368" role="sign"/>
+    <member type="way" ref="131554121" role="to"/>
+    <tag k="destination" v="Pichlberg;Pfnatsch Alm;Sunnolm"/>
+    <tag k="ref" v="9"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805089">
+    <member type="node" ref="3906804389" role="sign"/>
+    <member type="node" ref="252412732" role="intersection"/>
+    <member type="way" ref="288661683" role="to"/>
+    <tag k="destination" v="Kassianspitz"/>
+    <tag k="ref" v="9"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805097">
+    <member type="node" ref="3569587404" role="intersection"/>
+    <member type="way" ref="41730473" role="to"/>
+    <member type="node" ref="3906146966" role="sign"/>
+    <tag k="destination" v="Reinswald"/>
+    <tag k="ref" v="T"/>
+    <tag k="time" v="0:30"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805098">
+    <member type="node" ref="1558322080" role="intersection"/>
+    <member type="node" ref="3906146972" role="sign"/>
+    <member type="way" ref="388232028" role="to"/>
+    <tag k="destination" v="Toten Kirchl;Kreuzweg Herz Jesu"/>
+    <tag k="ref" v="T;T"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805100">
+    <member type="node" ref="3906146970" role="sign"/>
+    <member type="node" ref="309386663" role="intersection"/>
+    <member type="way" ref="388232033" role="to"/>
+    <tag k="destination" v="Kreuzweg Herz Jesu;Prakfiederer Jöchl;Totenkirckl"/>
+    <tag k="ref" v="T;T;T"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+  <relation id="5805108">
+    <member type="node" ref="878665541" role="intersection"/>
+    <member type="node" ref="3906146969" role="sign"/>
+    <member type="way" ref="41730473" role="to"/>
+    <tag k="destination" v="Totenkirchl;Prackfieder Jöchl;Krezweg Herz Jesu;Stum-Leger;Stöffl Hütte"/>
+    <tag k="type" v="destination_sign"/>
+  </relation>
+
+</osm>

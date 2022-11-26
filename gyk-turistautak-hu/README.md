@@ -1,4 +1,6 @@
-An experimental interface for viewing marked trails and signs.
+# GyK-Turistautak
+
+An experimental interface for viewing marked trails and signs. It is related to the former turistautak.hu project developed by András Kolesár (the data which this system would work on was based on that).
 
 Entry points, for example:
 

@@ -1,0 +1,125 @@
+# SignpostPrinter - Mária út piktogramkönyvtár
+
+[O]		picto/o.pdf
+
+#####  Mária út piktogramok, útszámok  #####
+
+[MÁRIA ÚT]	picto/MARIA_UT.pdf
+[MÁRIA ÚT_K]	picto/MARIA_UT.pdf
+[MÁRIA ÚT_S]	picto/MARIA_UT.pdf
+
+[M01]		picto/m01.pdf
+[M10]		picto/m10.pdf
+[M80]		picto/m80.pdf
+[M81]		picto/m81.pdf
+[M07]		picto/m07.pdf
+[M60]		picto/m60.pdf
+
+[Vm+]		picto/jel/Vmjel.pdf
+[Km+]		picto/jel/Kmjel.pdf
+[Pm+]		picto/jel/Pmjel.pdf
+[Sm+]		picto/jel/Smjel.pdf
+[Zm+]		picto/jel/Zmjel.pdf
+
+#####  Speciális turistajelek  #####
+
+[K+ < KL]	picto/Kcro_left_KL.pdf
+
+[E4]		picto/E_4_sign.jpg
+
+#####  Turistajelek  #####
+
+[K]		picto/jel/K.pdf
+[P]		picto/jel/P.pdf
+[S]		picto/jel/S.pdf
+[Z]		picto/jel/Z.pdf
+[V]		picto/jel/V.pdf
+[K+]		picto/jel/Kcro.pdf
+[P+]		picto/jel/Pcro.pdf
+[S+]		picto/jel/Scro.pdf
+[Z+]		picto/jel/Zcro.pdf
+[V+]		picto/jel/Vcro.pdf
+[K+<]		picto/jel/Kkap.pdf
+[P+<]		picto/jel/Pkap.pdf
+[S+<]		picto/jel/Skap.pdf
+[Z+<]		picto/jel/Zkap.pdf
+[V+<]		picto/jel/Vkap.pdf
+[K3]		picto/jel/K3.pdf
+[P3]		picto/jel/P3.pdf
+[S3]		picto/jel/S3.pdf
+[Z3]		picto/jel/Z3.pdf
+[V3]		picto/jel/V3.pdf
+[KC]		picto/jel/KC.pdf
+[PC]		picto/jel/PC.pdf
+[SC]		picto/jel/SC.pdf
+[ZC]		picto/jel/ZC.pdf
+[VC]		picto/jel/VC.pdf
+
+[K4]		picto/jel/K4.pdf
+[L4]		picto/jel/L4.pdf
+[KO]		picto/jel/KO.pdf
+[ZO]		picto/jel/ZO.pdf
+[VO]		picto/jel/VO.pdf
+[KB]		picto/jel/KB.pdf
+[VB]		picto/jel/VB.pdf
+[KL]		picto/jel/KL.pdf
+[VL]		picto/jel/VL.pdf
+#...itt bõvíthetõ a hiányzó kombinációkkal...
+
+#####  Tábla kiegészítõ piktogramok - irányok, jármódok  #####
+
+[<]		picto/balra.pdf
+[>]		picto/jobbra.pdf
+
+[gyalog-f]	picto/gyalogos_f.pdf
+[kerékpár-f]	picto/biciklis_f.pdf
+[gyalog]	picto/gyalogos.pdf
+[kerékpár]	picto/biciklis.pdf
+[lovas]		picto/lovas.pdf
+[kerekessz]	picto/kerekesszekes.pdf
+
+#####  Közlekedés  #####
+
+[busz]		picto/busz.pdf
+[vonat]		picto/vasut.pdf
+[vasút]		picto/vasut.pdf
+[komp]		picto/hajo-komp.pdf
+[központ]	picto/kozpont.pdf
+[község]	picto/kozpont.pdf
+[város]		picto/nagykozpont.pdf
+[városkp]	picto/nagykozpont.pdf
+
+#####  Szakrális helyek  #####
+
+[kereszt]	picto/kereszt.pdf
+[szentkút]	picto/szentkut.pdf
+[templom]	picto/templom.pdf
+[fõtemplom]	picto/fotemplom.pdf
+[kegyhely]	picto/fotemplom.pdf
+
+#####  Természet és turisztika  #####
+
+[természet]	picto/termeszetiertek.pdf
+[kilátóhely]	picto/kilatopont.pdf
+[kilátó]	picto/kilatopont.pdf
+[kilátás]	picto/kilatopont.pdf
+[vár]		picto/var.pdf
+[múzeum]	picto/muzeum.pdf
+[kastély]	picto/kastely-muemlek.pdf
+[mûemlék]	picto/kastely-muemlek.pdf
+[info]		picto/info.pdf
+[víz]		picto/ivoviz.pdf
+[forrás]	picto/ivoviz.pdf
+[pihenõ]	picto/erdei-piheno.pdf
+[szállás]	picto/szallas.pdf
+[sátor]		picto/satorhely.pdf
+[orvos]		picto/orvos.pdf
+
+#####  Mária út specifikus hely-piktogramok  #####
+
+[m-info]	picto/mariaut-info.pdf
+[m-pecsét]	picto/mariaut-pecset.pdf
+
+#####  Egyéb speciális hely-piktogramok  #####
+
+[világörökség]  picto/WorldHeritage.png
